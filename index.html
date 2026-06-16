@@ -101,6 +101,14 @@
   .divider{height:1px;background:var(--line);margin:6px 0 18px}
   .pid-note{font-size:11px;color:var(--faint);line-height:1.5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:-6px;margin-bottom:16px}
   .pid-note a{color:var(--pink)}
+  .chic-add{display:flex;gap:8px;align-items:stretch}
+  .chic-add input{flex:1;min-width:0}
+  .mini-btn{flex:none;background:var(--pink);color:#2a0d1a;border:none;border-radius:12px;padding:0 18px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+  .mini-btn:active{transform:scale(.96)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .chip-x{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 12px;font-size:12px;color:var(--txt)}
+  .chip-x button{background:none;border:none;color:var(--mut);font-size:15px;line-height:1;cursor:pointer;padding:0 2px;width:auto}
+  .chip-x button:active{color:var(--red)}
 </style>
 </head>
 <body>
@@ -138,6 +146,17 @@
 
     <div class="divider"></div>
     <div class="field">
+      <label>Chic Chic days ✨</label>
+      <div class="chic-add">
+        <input type="date" id="chicDate">
+        <button type="button" class="mini-btn" onclick="addChic()">Add</button>
+      </div>
+      <div class="hint">Add each day you did Chic Chic — keeps the count right. Tap × to remove one.</div>
+      <div id="chicChips" class="chips"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
       <label>Sync code (Pantry ID)</label>
       <input type="text" id="pantryId" placeholder="paste your Pantry ID here" autocapitalize="off" autocorrect="off" spellcheck="false">
     </div>
@@ -154,6 +173,7 @@ const PANTRY='https://getpantry.cloud/apiv1/pantry';
 const BASKET='cycle';
 const DAY=86400000;
 let pollTimer=null;
+let editLog=[];
 
 const PHASES=[
   {emoji:'🩸', label:'Code Red',    color:'#e8607a',
@@ -308,11 +328,11 @@ function render(keepSync){
     <div class="quip">${p.quip}</div>
 
     ${(()=>{const ch=chicInfo(d,c.cycleStart);
-      const big=ch.loggedToday?'Today 🎉':(ch.daysAgo!=null?`${ch.daysAgo} day${ch.daysAgo===1?'':'s'} ago`:'Not logged yet');
-      const sub=ch.last?`Last on ${fmt(ch.last)} · ${ch.thisCycle} this cycle`:'Tap to log the first one';
+      const big=ch.loggedToday?'Today 🎉':(ch.daysAgo!=null?`${ch.daysAgo} day${ch.daysAgo===1?'':'s'} ago`:'None logged yet');
+      const sub=ch.last?`Last on ${fmt(ch.last)} · ${ch.thisCycle} this cycle`:'Add days in settings ⚙';
       return `<div class="chic">
         <div><div class="chic-k">✨ Chic Chic</div><div class="chic-v">${big}</div><div class="chic-sub">${sub}</div></div>
-        <button class="chic-btn ${ch.loggedToday?'done':''}" onclick="markChic()">${ch.loggedToday?'✓ Today':'Mark today'}</button>
+        <button class="chic-btn" onclick="openSheet(false)">＋ Add</button>
       </div>`;})()}
 
     <div class="grid2">
@@ -371,11 +391,34 @@ function openSheet(first){
   const d=loadLocal();
   if(d){ if(d.start)document.getElementById('startDate').value=d.start; document.getElementById('cycleLen').value=d.cycleLen||28; document.getElementById('periodLen').value=d.periodLen||5; document.getElementById('pantryId').value=d.pantryId||''; }
   if(!document.getElementById('startDate').value) quickDate(0);
+  editLog=(d&&d.log)?d.log.slice():[];
+  document.getElementById('chicDate').value=isoLocal(new Date());
+  renderChicChips();
   document.getElementById('sheetTitle').textContent = (d&&d.start)?'Update the cycle':'Set up the cycle';
   document.getElementById('sheet').classList.add('show');
 }
 function closeSheet(){ document.getElementById('sheet').classList.remove('show'); render(); }
 function quickDate(off){ const d=new Date(); d.setDate(d.getDate()+off); document.getElementById("startDate").value=isoLocal(d); }
+
+function renderChicChips(){
+  const box=document.getElementById('chicChips');
+  if(!box) return;
+  const sorted=editLog.slice().sort().reverse();
+  box.innerHTML = sorted.length ? sorted.map(s=>{
+    const dt=midnight(new Date(s+'T00:00:00'));
+    return `<span class="chip-x">${fmt(dt)}<button type="button" onclick="removeChic('${s}')">×</button></span>`;
+  }).join('') : `<span style="font-size:12px;color:var(--faint)">No days added yet</span>`;
+}
+function addChic(){
+  const v=document.getElementById('chicDate').value;
+  if(!v) return;
+  if(!editLog.includes(v)) editLog.push(v);
+  renderChicChips();
+}
+function removeChic(s){
+  editLog=editLog.filter(x=>x!==s);
+  renderChicChips();
+}
 
 async function save(){
   const start=document.getElementById('startDate').value;
@@ -383,38 +426,11 @@ async function save(){
   const cycleLen=Math.max(20,Math.min(45,parseInt(document.getElementById('cycleLen').value)||28));
   const periodLen=Math.max(2,Math.min(10,parseInt(document.getElementById('periodLen').value)||5));
   const pantryId=document.getElementById('pantryId').value.trim();
-  const prev=loadLocal()||{};
-  const d={start,cycleLen,periodLen,pantryId,log:prev.log||[]};
+  const d={start,cycleLen,periodLen,pantryId,log:editLog.slice().sort()};
   saveLocal(d);
   document.getElementById('sheet').classList.remove('show');
   render(true);
   if(pantryId) await syncPush(d);
-}
-
-async function markChic(){
-  const d=loadLocal(); if(!d) return;
-  const today=isoLocal(new Date());
-  let log=d.log||[];
-  const had=log.includes(today);
-  log = had ? log.filter(x=>x!==today) : [...log,today];
-  d.log=log; saveLocal(d); render(true);
-  if(!d.pantryId) return;
-  setSync('load','Saving…');
-  try{
-    let remoteLog=[];
-    try{
-      const r=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{headers:{'Content-Type':'application/json'}});
-      if(r.ok){ const rj=await r.json(); remoteLog=rj.log||[]; if(rj.start){ d.start=rj.start; d.cycleLen=rj.cycleLen; d.periodLen=rj.periodLen; } }
-    }catch(e){}
-    const set=new Set([...remoteLog,...log]);
-    if(had) set.delete(today); else set.add(today);
-    const mergedLog=[...set].sort();
-    d.log=mergedLog; saveLocal(d);
-    const body={start:d.start,cycleLen:d.cycleLen,periodLen:d.periodLen,log:mergedLog,updatedAt:new Date().toISOString()};
-    const w=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    if(!w.ok) throw new Error('push');
-    render(true); setSync('ok','Saved & synced');
-  }catch(e){ setSync('err','Saved on phone — sync failed'); }
 }
 
 document.getElementById('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') closeSheet(); });

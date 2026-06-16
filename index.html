@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chic Chic">
+<meta name="theme-color" content="#171019">
+<title>Chic Chic</title>
+<style>
+  :root{
+    --bg:#171019; --bg2:#1f1622; --card:#241a2a; --line:rgba(255,255,255,0.08);
+    --txt:#f3ecf4; --mut:#a99bb0; --faint:#766b7d;
+    --red:#e8607a; --amber:#e8a24a; --teal:#4fc7a8; --pink:#d98bb0;
+    --green:#7bd88f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;min-height:100dvh;padding:env(safe-area-inset-top) 18px calc(env(safe-area-inset-bottom) + 28px);max-width:480px;margin:0 auto;overflow-x:hidden}
+  .wrap{padding-top:22px}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;letter-spacing:.2px}
+  .brand .moon{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 32% 32%,#fbe9c9,#e8a24a 60%,#b9742f);box-shadow:0 0 14px rgba(232,162,74,.4)}
+  .gear{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--mut);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
+  .gear:active{transform:scale(.93)}
+
+  .sync{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--faint);margin:0 2px 18px;height:14px}
+  .sdot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex:none}
+  .sdot.ok{background:var(--green)} .sdot.err{background:var(--red)} .sdot.load{background:var(--amber);animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  .hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:2px 0 24px}
+  .ring{position:relative;width:240px;height:240px}
+  .ring svg{transform:rotate(-90deg)}
+  .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px}
+  .emoji{font-size:42px;line-height:1;margin-bottom:8px}
+  .phase{font-size:25px;font-weight:700;letter-spacing:.2px}
+  .dayline{font-size:13px;color:var(--mut);margin-top:9px}
+
+  .quip{text-align:center;font-size:14.5px;line-height:1.55;color:var(--txt);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 18px;margin-bottom:14px}
+  .quip b{font-weight:600}
+
+  .chic{background:linear-gradient(135deg,rgba(232,96,122,.16),rgba(217,139,176,.10));border:1px solid rgba(232,96,122,.3);border-radius:18px;padding:15px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .chic-k{font-size:11px;color:var(--pink);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:5px}
+  .chic-v{font-size:19px;font-weight:700;letter-spacing:.2px}
+  .chic-sub{font-size:12px;color:var(--mut);margin-top:3px}
+  .chic-btn{flex:none;background:linear-gradient(135deg,#e8607a,#d98bb0);color:#2a0d1a;border:none;border-radius:13px;padding:12px 16px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
+  .chic-btn:active{transform:scale(.95)}
+  .chic-btn.done{background:transparent;color:var(--pink);border:1.5px solid var(--pink)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+  .stat .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px;margin-bottom:7px}
+  .stat .v{font-size:18px;font-weight:600;letter-spacing:.2px}
+  .stat .v small{font-size:12.5px;font-weight:400;color:var(--mut)}
+  .stat .sub{font-size:12px;color:var(--mut);margin-top:3px}
+
+  .section-t{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1.3px;margin:8px 2px 11px}
+
+  .timeline{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;margin-bottom:14px}
+  .bar{display:flex;height:13px;border-radius:7px;overflow:hidden;margin-bottom:12px}
+  .seg{height:100%}
+  .marker{position:relative;height:0}
+  .dot{position:absolute;top:-19px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--bg);box-shadow:0 0 0 2px #fff;transform:translateX(-50%)}
+  .legend{display:flex;flex-wrap:wrap;gap:9px 14px;margin-top:4px}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut)}
+  .sw{width:9px;height:9px;border-radius:3px}
+
+  .phaselist{display:flex;flex-direction:column;gap:9px;margin-bottom:6px}
+  .pcard{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px}
+  .pcard.active{border-color:rgba(255,255,255,.28)}
+  .pemoji{font-size:23px;width:30px;text-align:center}
+  .pmeta{flex:1;min-width:0}
+  .pname{font-size:14.5px;font-weight:600}
+  .pdesc{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.45}
+  .prange{font-size:11px;color:var(--faint);white-space:nowrap}
+
+  .foot{text-align:center;font-size:11px;color:var(--faint);margin-top:20px;line-height:1.6}
+
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:50}
+  .sheet.show{display:flex}
+  .panel{width:100%;max-width:480px;background:var(--bg2);border-top-left-radius:26px;border-top-right-radius:26px;border-top:1px solid var(--line);padding:22px 20px calc(env(safe-area-inset-bottom) + 26px);max-height:92vh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.8,.25,1)}
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .panel h2{font-size:19px;font-weight:700;margin-bottom:4px}
+  .panel .lead{font-size:13px;color:var(--mut);margin-bottom:18px;line-height:1.5}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12.5px;color:var(--mut);margin-bottom:7px;font-weight:500}
+  .field .hint{font-size:11.5px;color:var(--faint);margin-top:6px;line-height:1.4}
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px;color:var(--txt);font-size:16px;font-family:inherit}
+  input:focus{outline:none;border-color:var(--pink)}
+  .row{display:flex;gap:12px}
+  .row .field{flex:1}
+  .btn{width:100%;background:linear-gradient(135deg,#e8607a,#d98bb0);color:#2a0d1a;border:none;border-radius:14px;padding:15px;font-size:15.5px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px}
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{opacity:.5}
+  .btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--line);margin-top:10px;font-weight:500}
+  .quick{display:flex;gap:8px;margin-top:9px}
+  .chip{flex:1;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 4px;font-size:12.5px;color:var(--mut);cursor:pointer}
+  .chip:active{transform:scale(.96)}
+  .divider{height:1px;background:var(--line);margin:6px 0 18px}
+  .pid-note{font-size:11px;color:var(--faint);line-height:1.5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:-6px;margin-bottom:16px}
+  .pid-note a{color:var(--pink)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<div class="sheet" id="sheet">
+  <div class="panel">
+    <h2 id="sheetTitle">Set up the cycle</h2>
+    <p class="lead">Enter the first day of her last period. The app does the rest and keeps both phones in sync.</p>
+
+    <div class="field">
+      <label>First day of her last period</label>
+      <input type="date" id="startDate">
+      <div class="quick">
+        <div class="chip" onclick="quickDate(0)">Today</div>
+        <div class="chip" onclick="quickDate(-1)">Yesterday</div>
+        <div class="chip" onclick="quickDate(-3)">3d ago</div>
+        <div class="chip" onclick="quickDate(-7)">A week</div>
+      </div>
+      <div class="hint">Started on the 5th? Pick the 5th. Day 1 = first day of real bleeding.</div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Cycle length</label>
+        <input type="number" id="cycleLen" min="20" max="45" value="28">
+        <div class="hint">Avg 28</div>
+      </div>
+      <div class="field">
+        <label>Period length</label>
+        <input type="number" id="periodLen" min="2" max="10" value="5">
+        <div class="hint">Avg 5</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Sync code (Pantry ID)</label>
+      <input type="text" id="pantryId" placeholder="paste your Pantry ID here" autocapitalize="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="pid-note">Get a free one at <a href="https://getpantry.cloud" target="_blank">getpantry.cloud</a> (just an email). Paste the <b>same</b> code on both phones — that's what links you. Leave blank to use this phone only, no sync.</div>
+
+    <button class="btn" id="saveBtn" onclick="save()">Save &amp; sync</button>
+    <button class="btn ghost" onclick="closeSheet()">Cancel</button>
+  </div>
+</div>
+
+<script>
+const LKEY='chicChic.v1';
+const PANTRY='https://getpantry.cloud/apiv1/pantry';
+const BASKET='cycle';
+const DAY=86400000;
+let pollTimer=null;
+
+const PHASES=[
+  {emoji:'🩸', label:'Code Red',    color:'#e8607a',
+   quip:"It's <b>Code Red</b>. Energy's low, cramps are real. Show up with snacks, a hot water bag, and zero opinions on dinner.",
+   short:'Snacks, heat pad, no debates'},
+  {emoji:'🌱', label:'Glow Up',     color:'#4fc7a8',
+   quip:"She's <b>back online</b> — energy rising, mood lifting, up for anything. Best week to say yes to a trip or try something new.",
+   short:'High energy, say yes to plans'},
+  {emoji:'💘', label:'Date Night',  color:'#e8a24a',
+   quip:"Peak <b>charm offensive</b>. Feeling herself, vibes are great. Book the nice dinner — this is the window.",
+   short:'Peak mood, book something nice'},
+  {emoji:'🌧️', label:'Storm Watch', color:'#d98bb0',
+   quip:"<b>Handle with care.</b> Mood swings, cravings, short fuse. Keep chocolate stocked, agree often, pick your battles wisely.",
+   short:'Chocolate, patience, agree often'},
+];
+
+function loadLocal(){ try{return JSON.parse(localStorage.getItem(LKEY))}catch(e){return null} }
+function saveLocal(d){ localStorage.setItem(LKEY,JSON.stringify(d)) }
+
+function fmt(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}
+function fmtFull(d){return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
+function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+function midnight(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
+
+function phaseIdx(dayInCycle,C,P){
+  const ov=C-14;
+  if(dayInCycle<=P) return 0;
+  if(dayInCycle<ov-1) return 1;
+  if(dayInCycle<=ov+1) return 2;
+  return 3;
+}
+function phaseRange(i,C,P){
+  const ov=C-14;
+  if(i===0) return `1–${P}`;
+  if(i===1) return `${P+1}–${ov-2}`;
+  if(i===2) return `${ov-1}–${ov+1}`;
+  return `${ov+2}–${C}`;
+}
+
+function compute(d){
+  const today=midnight(new Date());
+  const start=midnight(new Date(d.start+'T00:00:00'));
+  const C=d.cycleLen, P=d.periodLen;
+  let diff=Math.floor((today-start)/DAY);
+  let cycleStart=new Date(start);
+  while(diff>=C){ cycleStart=new Date(cycleStart.getTime()+C*DAY); diff-=C; }
+  const dayInCycle=diff+1;
+  const pIndex=phaseIdx(dayInCycle,C,P);
+  const nextStart=new Date(cycleStart.getTime()+C*DAY);
+  const daysToNext=Math.round((nextStart-today)/DAY);
+  const lastStart=new Date(cycleStart.getTime()-C*DAY);
+  const ov=C-14;
+  const ovDate=new Date(cycleStart.getTime()+(ov-1)*DAY);
+  const daysToOv=Math.round((ovDate-today)/DAY);
+  const fertileStart=new Date(ovDate.getTime()-5*DAY);
+  return {today,cycleStart,nextStart,lastStart,dayInCycle,pIndex,C,P,daysToNext,ovDate,daysToOv,fertileStart};
+}
+
+function chicInfo(d,cycleStart){
+  const log=(d.log||[]).slice().sort();
+  const today=midnight(new Date());
+  const todayStr=today.toISOString().slice(0,10);
+  const loggedToday=log.includes(todayStr);
+  let last=null, daysAgo=null;
+  if(log.length){ last=midnight(new Date(log[log.length-1]+'T00:00:00')); daysAgo=Math.round((today-last)/DAY); }
+  const thisCycle=log.filter(s=>{const dt=midnight(new Date(s+'T00:00:00')); return dt>=cycleStart && dt<=today;}).length;
+  return {log,loggedToday,last,daysAgo,thisCycle,todayStr};
+}
+
+function setSync(state,text){
+  const el=document.getElementById('syncLine');
+  if(!el) return;
+  const cls=state==='ok'?'ok':state==='err'?'err':state==='load'?'load':'';
+  el.innerHTML=`<span class="sdot ${cls}"></span>${text}`;
+}
+
+async function syncPull(silent){
+  const d=loadLocal();
+  if(!d||!d.pantryId){ return; }
+  if(!silent) setSync('load','Syncing…');
+  try{
+    const r=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{headers:{'Content-Type':'application/json'}});
+    if(!r.ok) throw new Error('basket');
+    const remote=await r.json();
+    if(remote && remote.start){
+      const localLog=d.log||[], remoteLog=remote.log||[];
+      const log=[...new Set([...localLog,...remoteLog])].sort();
+      const merged={...d, start:remote.start, cycleLen:remote.cycleLen, periodLen:remote.periodLen, log, updatedAt:remote.updatedAt};
+      saveLocal(merged);
+      render(true);
+      const u=remote.updatedAt?new Date(remote.updatedAt):null;
+      setSync('ok', u?`Synced · updated ${fmt(u)}`:'Synced just now');
+    } else { setSync('ok','Synced'); }
+  }catch(e){
+    setSync('err','Offline — showing last saved');
+  }
+}
+
+async function syncPush(d){
+  if(!d.pantryId) return;
+  setSync('load','Saving…');
+  try{
+    const body={start:d.start,cycleLen:d.cycleLen,periodLen:d.periodLen,log:d.log||[],updatedAt:new Date().toISOString()};
+    const r=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    if(!r.ok) throw new Error('push');
+    setSync('ok','Saved & synced');
+  }catch(e){
+    setSync('err','Saved on phone — sync failed');
+  }
+}
+
+function render(keepSync){
+  const d=loadLocal();
+  if(!d || !d.start){ document.getElementById('app').innerHTML=welcome(); return; }
+  const c=compute(d);
+  const p=PHASES[c.pIndex];
+  const R=104, CIRC=2*Math.PI*R, off=CIRC*(1-c.dayInCycle/c.C);
+  const ov=c.C-14;
+  const segs=[
+    {w:c.P,col:PHASES[0].color},
+    {w:(ov-1)-c.P,col:PHASES[1].color},
+    {w:3,col:PHASES[2].color},
+    {w:c.C-(ov+1),col:PHASES[3].color},
+  ];
+  const tot=segs.reduce((a,s)=>a+Math.max(0,s.w),0);
+  const barHTML=segs.map(s=>`<div class="seg" style="width:${Math.max(0,s.w)/tot*100}%;background:${s.col}"></div>`).join('');
+  const markPos=Math.min(99,(c.dayInCycle/c.C)*100);
+  const fert=(c.daysToOv>=-1 && c.daysToOv<=6)?` · fertile from ${fmt(c.fertileStart)}`:'';
+
+  document.getElementById('app').innerHTML=`
+    <div class="top">
+      <div class="brand"><span class="moon"></span> Chic Chic</div>
+      <div class="gear" onclick="openSheet(false)">⚙</div>
+    </div>
+    <div class="sync" id="syncLine"><span class="sdot ${d.pantryId?'ok':''}"></span>${d.pantryId?'Synced':'This phone only'}</div>
+
+    <div class="hero"><div class="ring">
+      <svg width="240" height="240" viewBox="0 0 240 240">
+        <circle cx="120" cy="120" r="${R}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="15"/>
+        <circle cx="120" cy="120" r="${R}" fill="none" stroke="${p.color}" stroke-width="15" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${off}"/>
+      </svg>
+      <div class="center">
+        <div class="emoji">${p.emoji}</div>
+        <div class="phase">${p.label}</div>
+        <div class="dayline">Day ${c.dayInCycle} of ${c.C}</div>
+      </div>
+    </div></div>
+
+    <div class="quip">${p.quip}</div>
+
+    ${(()=>{const ch=chicInfo(d,c.cycleStart);
+      const big=ch.loggedToday?'Today 🎉':(ch.daysAgo!=null?`${ch.daysAgo} day${ch.daysAgo===1?'':'s'} ago`:'Not logged yet');
+      const sub=ch.last?`Last on ${fmt(ch.last)} · ${ch.thisCycle} this cycle`:'Tap to log the first one';
+      return `<div class="chic">
+        <div><div class="chic-k">✨ Chic Chic</div><div class="chic-v">${big}</div><div class="chic-sub">${sub}</div></div>
+        <button class="chic-btn ${ch.loggedToday?'done':''}" onclick="markChic()">${ch.loggedToday?'✓ Today':'Mark today'}</button>
+      </div>`;})()}
+
+    <div class="grid2">
+      <div class="stat">
+        <div class="k">⏳ Next one</div>
+        <div class="v">${c.daysToNext===0?'Today':c.daysToNext===1?'Tomorrow':'in '+c.daysToNext+' days'}</div>
+        <div class="sub">~ ${fmtFull(c.nextStart)}</div>
+      </div>
+      <div class="stat">
+        <div class="k">↩ Last started</div>
+        <div class="v">${fmt(c.cycleStart)}</div>
+        <div class="sub">${Math.round((c.today-c.cycleStart)/DAY)} days ago</div>
+      </div>
+      <div class="stat">
+        <div class="k">💘 Date Night</div>
+        <div class="v">${c.daysToOv<0?'Passed':c.daysToOv===0?'Today':'in '+c.daysToOv+'d'}</div>
+        <div class="sub">${fmt(c.ovDate)}${fert}</div>
+      </div>
+      <div class="stat">
+        <div class="k">📊 Month before</div>
+        <div class="v">${fmt(c.lastStart)} <small>start</small></div>
+        <div class="sub">Same time last cycle</div>
+      </div>
+    </div>
+
+    <div class="section-t">This cycle at a glance</div>
+    <div class="timeline">
+      <div class="marker"><div class="dot" style="left:${markPos}%"></div></div>
+      <div class="bar">${barHTML}</div>
+      <div class="legend">${PHASES.map(x=>`<div class="lg"><span class="sw" style="background:${x.color}"></span>${x.label}</div>`).join('')}</div>
+    </div>
+
+    <div class="section-t">The four moods</div>
+    <div class="phaselist">
+      ${PHASES.map((x,i)=>`<div class="pcard ${i===c.pIndex?'active':''}">
+        <div class="pemoji">${x.emoji}</div>
+        <div class="pmeta"><div class="pname" style="color:${i===c.pIndex?x.color:'var(--txt)'}">${x.label}</div><div class="pdesc">${x.short}</div></div>
+        <div class="prange">Days ${phaseRange(i,c.C,c.P)}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="foot">Predictions are estimates from her average cycle — real bodies vary. Re-tap the start date each month to stay sharp.<br><br>Made with 🤍 for the calendar-impaired husband.</div>
+  `;
+  if(!keepSync && d.pantryId) syncPull(true);
+}
+
+function welcome(){
+  return `<div class="top"><div class="brand"><span class="moon"></span> Chic Chic</div></div>
+  <div style="text-align:center;padding:64px 12px"><div style="font-size:56px;margin-bottom:14px">🌙</div>
+  <div style="font-size:20px;font-weight:700;margin-bottom:8px">Let's get set up</div>
+  <div style="font-size:14px;color:var(--mut);line-height:1.6;margin-bottom:26px">Tap below, enter the first day of her last period, and (optionally) paste your sync code so both phones stay matched.</div>
+  <button class="btn" style="max-width:260px;margin:0 auto" onclick="openSheet(true)">Get started</button></div>`;
+}
+
+function openSheet(first){
+  const d=loadLocal();
+  if(d){ if(d.start)document.getElementById('startDate').value=d.start; document.getElementById('cycleLen').value=d.cycleLen||28; document.getElementById('periodLen').value=d.periodLen||5; document.getElementById('pantryId').value=d.pantryId||''; }
+  if(!document.getElementById('startDate').value) quickDate(0);
+  document.getElementById('sheetTitle').textContent = (d&&d.start)?'Update the cycle':'Set up the cycle';
+  document.getElementById('sheet').classList.add('show');
+}
+function closeSheet(){ document.getElementById('sheet').classList.remove('show'); render(); }
+function quickDate(off){ const d=new Date(); d.setDate(d.getDate()+off); document.getElementById('startDate').value=d.toISOString().slice(0,10); }
+
+async function save(){
+  const start=document.getElementById('startDate').value;
+  if(!start){ alert('Pick the start date first 🙂'); return; }
+  const cycleLen=Math.max(20,Math.min(45,parseInt(document.getElementById('cycleLen').value)||28));
+  const periodLen=Math.max(2,Math.min(10,parseInt(document.getElementById('periodLen').value)||5));
+  const pantryId=document.getElementById('pantryId').value.trim();
+  const prev=loadLocal()||{};
+  const d={start,cycleLen,periodLen,pantryId,log:prev.log||[]};
+  saveLocal(d);
+  document.getElementById('sheet').classList.remove('show');
+  render(true);
+  if(pantryId) await syncPush(d);
+}
+
+async function markChic(){
+  const d=loadLocal(); if(!d) return;
+  const today=new Date().toISOString().slice(0,10);
+  let log=d.log||[];
+  const had=log.includes(today);
+  log = had ? log.filter(x=>x!==today) : [...log,today];
+  d.log=log; saveLocal(d); render(true);
+  if(!d.pantryId) return;
+  setSync('load','Saving…');
+  try{
+    let remoteLog=[];
+    try{
+      const r=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{headers:{'Content-Type':'application/json'}});
+      if(r.ok){ const rj=await r.json(); remoteLog=rj.log||[]; if(rj.start){ d.start=rj.start; d.cycleLen=rj.cycleLen; d.periodLen=rj.periodLen; } }
+    }catch(e){}
+    const set=new Set([...remoteLog,...log]);
+    if(had) set.delete(today); else set.add(today);
+    const mergedLog=[...set].sort();
+    d.log=mergedLog; saveLocal(d);
+    const body={start:d.start,cycleLen:d.cycleLen,periodLen:d.periodLen,log:mergedLog,updatedAt:new Date().toISOString()};
+    const w=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!w.ok) throw new Error('push');
+    render(true); setSync('ok','Saved & synced');
+  }catch(e){ setSync('err','Saved on phone — sync failed'); }
+}
+
+document.getElementById('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') closeSheet(); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) syncPull(false); });
+function startPoll(){ if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden) syncPull(true); },60000); }
+
+render();
+syncPull(false);
+startPoll();
+</script>
+</body>
+</html>

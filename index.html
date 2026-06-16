@@ -177,6 +177,7 @@ function fmt(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'
 function fmtFull(d){return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
 function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
 function midnight(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
+function isoLocal(d){const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
 
 function phaseIdx(dayInCycle,C,P){
   const ov=C-14;
@@ -215,7 +216,7 @@ function compute(d){
 function chicInfo(d,cycleStart){
   const log=(d.log||[]).slice().sort();
   const today=midnight(new Date());
-  const todayStr=today.toISOString().slice(0,10);
+  const todayStr=isoLocal(today);
   const loggedToday=log.includes(todayStr);
   let last=null, daysAgo=null;
   if(log.length){ last=midnight(new Date(log[log.length-1]+'T00:00:00')); daysAgo=Math.round((today-last)/DAY); }
@@ -374,7 +375,7 @@ function openSheet(first){
   document.getElementById('sheet').classList.add('show');
 }
 function closeSheet(){ document.getElementById('sheet').classList.remove('show'); render(); }
-function quickDate(off){ const d=new Date(); d.setDate(d.getDate()+off); document.getElementById('startDate').value=d.toISOString().slice(0,10); }
+function quickDate(off){ const d=new Date(); d.setDate(d.getDate()+off); document.getElementById("startDate").value=isoLocal(d); }
 
 async function save(){
   const start=document.getElementById('startDate').value;
@@ -392,7 +393,7 @@ async function save(){
 
 async function markChic(){
   const d=loadLocal(); if(!d) return;
-  const today=new Date().toISOString().slice(0,10);
+  const today=isoLocal(new Date());
   let log=d.log||[];
   const had=log.includes(today);
   log = had ? log.filter(x=>x!==today) : [...log,today];

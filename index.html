@@ -29,6 +29,12 @@
   .sdot.ok{background:var(--green)} .sdot.err{background:var(--red)} .sdot.load{background:var(--amber);animation:pulse 1s infinite}
   @keyframes pulse{50%{opacity:.3}}
 
+  /* status (message-reactive) */
+  .status{border-radius:18px;padding:15px 16px;margin-bottom:14px;display:flex;align-items:center;gap:13px;border:1px solid rgba(255,255,255,.1)}
+  .status .se{font-size:30px;line-height:1;flex:none}
+  .status .sh{font-size:16px;font-weight:700;letter-spacing:.2px}
+  .status .ss{font-size:12px;opacity:.85;margin-top:3px;line-height:1.4}
+
   .banner{border-radius:15px;padding:12px 15px;margin-bottom:14px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:9px;line-height:1.4}
   .banner.warn{background:rgba(232,162,74,.15);border:1px solid rgba(232,162,74,.35);color:#f0c178}
   .banner.late{background:rgba(232,96,122,.15);border:1px solid rgba(232,96,122,.35);color:#f09bb0}
@@ -56,7 +62,7 @@
   .conf.amber{background:rgba(232,162,74,.16);color:var(--amber)}
   .conf.none{background:rgba(255,255,255,.06);color:var(--mut)}
 
-  .chic{background:linear-gradient(135deg,rgba(232,96,122,.16),rgba(217,139,176,.10));border:1px solid rgba(232,96,122,.3);border-radius:18px;padding:15px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .chic{background:linear-gradient(135deg,rgba(232,96,122,.16),rgba(217,139,176,.10));border:1px solid rgba(232,96,122,.3);border-radius:18px;padding:15px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
   .chic-k{font-size:11px;color:var(--pink);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:5px}
   .chic-v{font-size:19px;font-weight:700;letter-spacing:.2px}
   .chic-sub{font-size:12px;color:var(--mut);margin-top:3px}
@@ -76,7 +82,7 @@
   .stat .v small{font-size:12px;font-weight:400;color:var(--mut)}
   .stat .sub{font-size:11.5px;color:var(--mut);margin-top:3px}
 
-  .section-t{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1.3px;margin:18px 2px 11px;display:flex;align-items:center;justify-content:space-between}
+  .section-t{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1.3px;margin:18px 2px 11px}
 
   .timeline{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;margin-bottom:6px}
   .bar{display:flex;height:13px;border-radius:7px;overflow:hidden;margin-bottom:12px}
@@ -96,7 +102,6 @@
   .pdesc{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.45}
   .prange{font-size:11px;color:var(--faint);white-space:nowrap}
 
-  /* insights */
   .avg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .hist{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-top:12px}
   .hrow{display:flex;align-items:center;gap:10px;margin:9px 0}
@@ -106,7 +111,6 @@
   .hlen{font-size:12px;font-weight:600;width:42px;text-align:right;flex:none}
   .empty{font-size:12.5px;color:var(--faint);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;line-height:1.5}
 
-  /* calendar */
   .cal{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:6px}
   .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
   .cal-nav button{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer}
@@ -120,6 +124,10 @@
   .cal-cell.start{box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
   .cal-cc{position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:#fff}
   .cal-pred-note{font-size:10.5px;color:var(--faint);margin-top:10px;text-align:center}
+  /* chic calendar */
+  .ccell{aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--txt);position:relative;border:1px solid transparent;cursor:pointer}
+  .ccell.today{border-color:#fff}
+  .ccell .badge{position:absolute;top:2px;right:3px;font-size:9px;font-weight:700;background:var(--red);color:#2a0d1a;border-radius:7px;padding:0 4px;line-height:14px;min-width:14px;text-align:center}
 
   .foot{text-align:center;font-size:11px;color:var(--faint);margin-top:20px;line-height:1.6}
 
@@ -148,8 +156,16 @@
   .chip-x button{background:none;border:none;color:var(--mut);font-size:15px;line-height:1;cursor:pointer;padding:0 2px;width:auto}
   .chip-x button:active{color:var(--red)}
   .divider{height:1px;background:var(--line);margin:6px 0 18px}
-  .pid-note{font-size:11px;color:var(--faint);line-height:1.5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:-6px;margin-bottom:16px}
-  .pid-note a{color:var(--pink)}
+  .starsrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .starsrow .who{font-size:13px;font-weight:600;width:34px;flex:none}
+  .stars{display:flex;gap:4px}
+  .star{font-size:22px;cursor:pointer;line-height:1;filter:grayscale(1);opacity:.4}
+  .star.on{filter:none;opacity:1}
+  .two{display:flex;gap:10px}
+  .two .btn,.two .mini-btn{flex:1}
+  .exp{display:flex;gap:10px;margin-top:4px}
+  .exp button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:11px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer}
+  .exp button:active{transform:scale(.97)}
 </style>
 </head>
 <body>
@@ -158,7 +174,7 @@
 <div class="sheet" id="sheet">
   <div class="panel">
     <h2 id="sheetTitle">Cycle settings</h2>
-    <p class="lead">Log each period start date — the more you add, the smarter the predictions get. Everything syncs to both phones.</p>
+    <p class="lead">Log period start dates and Chic Chic entries. Everything auto‑syncs to both phones.</p>
 
     <div class="field">
       <label>Period start dates 🩸</label>
@@ -166,7 +182,7 @@
         <input type="date" id="startInput">
         <button type="button" class="mini-btn" onclick="addStart()">Add</button>
       </div>
-      <div class="hint">Add the first day of each period (newest and past ones). The most recent is your current cycle start. Tap × to remove.</div>
+      <div class="hint">First day of each period. The most recent is the current cycle start. Tap × to remove.</div>
       <div id="startChips" class="chips"></div>
     </div>
 
@@ -179,27 +195,32 @@
       <div class="field">
         <label>Starting estimate</label>
         <input type="number" id="cycleSeed" min="20" max="45" value="28">
-        <div class="hint">Cycle length used only until 2+ periods are logged.</div>
+        <div class="hint">Used until 2+ periods logged.</div>
       </div>
     </div>
 
     <div class="divider"></div>
     <div class="field">
-      <label>Chic Chic days ✨</label>
-      <div class="addrow">
-        <input type="date" id="chicInput">
-        <button type="button" class="mini-btn" onclick="addChic()">Add</button>
-      </div>
-      <div class="hint">Add each day you did Chic Chic — keeps the count right. Tap × to remove.</div>
+      <label>Log a Chic Chic ✨</label>
+      <div class="addrow" style="margin-bottom:12px"><input type="date" id="chicInput"></div>
+      <div class="starsrow"><span class="who">Aj</span><div class="stars" id="starsAj"></div></div>
+      <div class="starsrow"><span class="who">Ni</span><div class="stars" id="starsNi"></div></div>
+      <button type="button" class="mini-btn" style="width:100%;padding:11px 0" onclick="addChic()">＋ Add this entry</button>
+      <div class="hint">Add as many as you like — even several for one day. Each gets both your star ratings.</div>
       <div id="chicChips" class="chips"></div>
     </div>
 
     <div class="divider"></div>
     <div class="field">
-      <label>Sync code (Pantry ID)</label>
-      <input type="text" id="pantryId" placeholder="paste your Pantry ID here" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <label>Backup &amp; restore</label>
+      <div class="exp">
+        <button type="button" onclick="exportJSON()">⬇︎ Backup (JSON)</button>
+        <button type="button" onclick="exportCSV()">⬇︎ CSV</button>
+        <button type="button" onclick="document.getElementById('importFile').click()">⬆︎ Restore</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importJSON(event)">
+      <div class="hint">Backup downloads everything as a file you keep. Restore loads a backup back in.</div>
     </div>
-    <div class="pid-note">Get a free one at <a href="https://getpantry.cloud" target="_blank">getpantry.cloud</a>. Paste the <b>same</b> code on both phones. Leave blank for this phone only.</div>
 
     <button class="btn" onclick="save()">Save &amp; sync</button>
     <button class="btn ghost" onclick="closeSheet()">Cancel</button>
@@ -209,9 +230,10 @@
 <script>
 const LKEY='chicChic.v2';
 const PANTRY='https://getpantry.cloud/apiv1/pantry';
+const PANTRY_ID='02f8fe61-5672-486d-8271-373da9e3600d';   // baked in — both phones share this, always syncs
 const BASKET='cycle';
 const DAY=86400000;
-let pollTimer=null, editStarts=[], editLog=[], calMonth=null;
+let pollTimer=null, editStarts=[], editEntries=[], editAj=0, editNi=0, calMonth=null, chicCalMonth=null;
 
 const PHASES=[
   {emoji:'🩸', label:'Code Red',    color:'#e8607a',
@@ -230,16 +252,22 @@ const PHASES=[
 const PCOL=PHASES.map(p=>p.color);
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+function uid(date){ return date+'-'+Math.random().toString(36).slice(2,8); }
 function loadLocal(){ try{return normalize(JSON.parse(localStorage.getItem(LKEY)))}catch(e){return null} }
 function saveLocal(d){ localStorage.setItem(LKEY,JSON.stringify(d)) }
 function normalize(d){
   if(!d) return null;
   if(!Array.isArray(d.starts)) d.starts = d.start ? [d.start] : [];
   d.starts = [...new Set(d.starts)].sort();
-  if(!Array.isArray(d.log)) d.log = [];
-  d.log = [...new Set(d.log)].sort();
-  if(typeof d.periodLen!=='number') d.periodLen = 5;
-  if(typeof d.cycleSeed!=='number') d.cycleSeed = (typeof d.cycleLen==='number'?d.cycleLen:28);
+  let entries = Array.isArray(d.entries) ? d.entries : (Array.isArray(d.log) ? d.log : []);
+  entries = entries.map(e=> typeof e==='string'
+      ? {id:e+'-0', date:e, aj:0, ni:0}
+      : {id:e.id||uid(e.date), date:e.date, aj:+e.aj||0, ni:+e.ni||0}
+    ).filter(e=>e.date);
+  entries.sort((a,b)=> a.date<b.date?-1 : a.date>b.date?1 : (a.id<b.id?-1:1));
+  d.entries=entries; delete d.log;
+  if(typeof d.periodLen!=='number') d.periodLen=5;
+  if(typeof d.cycleSeed!=='number') d.cycleSeed=(typeof d.cycleLen==='number'?d.cycleLen:28);
   return d;
 }
 
@@ -249,6 +277,7 @@ function midnight(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
 function isoLocal(d){const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
 function addDays(d,n){return new Date(d.getTime()+n*DAY);}
 function parseD(s){return midnight(new Date(s+'T00:00:00'));}
+function monthName(k){ if(!k) return ''; const [y,m]=k.split('-'); return MONTHS[parseInt(m)-1].slice(0,3)+" '"+y.slice(2); }
 
 function phaseIdx(dayInCycle,C,P){
   const ov=C-14;
@@ -262,14 +291,9 @@ function stats(d){
   const dates=d.starts.map(parseD);
   const lengths=[];
   for(let i=1;i<dates.length;i++) lengths.push(Math.round((dates[i]-dates[i-1])/DAY));
-  const recent=lengths.slice(-6);
-  const n=recent.length;
+  const recent=lengths.slice(-6); const n=recent.length;
   let avg=null,min=null,max=null,predicted=d.cycleSeed;
-  if(n>=1){
-    avg=Math.round(recent.reduce((a,b)=>a+b,0)/n);
-    min=Math.min(...recent); max=Math.max(...recent);
-    predicted=avg;
-  }
+  if(n>=1){ avg=Math.round(recent.reduce((a,b)=>a+b,0)/n); min=Math.min(...recent); max=Math.max(...recent); predicted=avg; }
   return {dates,lengths,recent,n,avg,min,max,predicted,spread:(n?max-min:0)};
 }
 
@@ -289,8 +313,7 @@ function prediction(d,st){
   const L=st.predicted, P=d.periodLen;
   const nextStart=addDays(lastStart,L);
   const daysToNext=Math.round((nextStart-today)/DAY);
-  const isLate=daysToNext<0;
-  const daysLate=-daysToNext;
+  const isLate=daysToNext<0, daysLate=-daysToNext;
   const lo=st.n?addDays(lastStart,st.min):addDays(nextStart,-2);
   const hi=st.n?addDays(lastStart,st.max):addDays(nextStart,2);
   const daysSince=Math.floor((today-lastStart)/DAY);
@@ -298,107 +321,109 @@ function prediction(d,st){
   let pIdx=phaseIdx(dayInCycle,L,P);
   if(dayInCycle>L) pIdx=3;
   const ovDay=L-14;
-  let ovDate=addDays(lastStart,ovDay-1);
-  let daysToOv=Math.round((ovDate-today)/DAY);
+  const ovDateCur=addDays(lastStart,ovDay-1);
+  let ovDate=ovDateCur; let daysToOv=Math.round((ovDate-today)/DAY);
   if(daysToOv<0){ ovDate=addDays(nextStart,ovDay-1); daysToOv=Math.round((ovDate-today)/DAY); }
   const fertileStart=addDays(ovDate,-5);
   const inFertile = today>=fertileStart && today<=ovDate;
-  return {today,lastStart,L,P,nextStart,daysToNext,isLate,daysLate,lo,hi,daysSince,dayInCycle,pIdx,ovDate,daysToOv,fertileStart,inFertile};
+  return {today,lastStart,L,P,nextStart,daysToNext,isLate,daysLate,lo,hi,daysSince,dayInCycle,pIdx,ovDate,ovDateCur,daysToOv,fertileStart,inFertile};
 }
 
 function chicInfo(d,cycleStart){
-  const log=d.log.slice().sort();
+  const entries=d.entries;
   const today=midnight(new Date());
-  const loggedToday=log.includes(isoLocal(today));
+  const todayStr=isoLocal(today);
+  const dayset=[...new Set(entries.map(e=>e.date))].sort();
+  const loggedToday=dayset.includes(todayStr);
   let last=null,daysAgo=null;
-  if(log.length){ last=parseD(log[log.length-1]); daysAgo=Math.round((today-last)/DAY); }
-  const thisCycle=cycleStart?log.filter(s=>{const dt=parseD(s);return dt>=cycleStart && dt<=today;}).length:0;
-
-  // gaps between consecutive logged days
-  const dts=log.map(parseD);
-  const gaps=[];
+  if(dayset.length){ last=parseD(dayset[dayset.length-1]); daysAgo=Math.round((today-last)/DAY); }
+  const dts=dayset.map(parseD); const gaps=[];
   for(let i=1;i<dts.length;i++) gaps.push(Math.round((dts[i]-dts[i-1])/DAY));
-  // longest PAST gap (between two actual sessions) and when it happened
-  let recordGap=0, recordStart=null, recordEnd=null;
+  let recordGap=0,recordStart=null,recordEnd=null;
   for(let i=0;i<gaps.length;i++){ if(gaps[i]>recordGap){ recordGap=gaps[i]; recordStart=dts[i]; recordEnd=dts[i+1]; } }
-  const avgGap = gaps.length ? Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length) : null;
-  const currentGap = daysAgo;            // ongoing stretch since last session
-  // is the ongoing stretch challenging / beating the record?
-  const beatingRecord = (currentGap!=null && recordGap>0 && currentGap>recordGap);
-  const nearRecord = (currentGap!=null && recordGap>0 && !beatingRecord && (recordGap-currentGap)<=2);
-  // this month + best month
-  const monthKey=s=>s.slice(0,7);
-  const monthCounts={};
-  log.forEach(s=>{ const k=monthKey(s); monthCounts[k]=(monthCounts[k]||0)+1; });
-  const thisMonth = monthCounts[isoLocal(today).slice(0,7)] || 0;
-  let bestMonth=0, bestMonthKey=null;
-  Object.entries(monthCounts).forEach(([k,v])=>{ if(v>bestMonth){ bestMonth=v; bestMonthKey=k; } });
-
-  return {log,loggedToday,last,daysAgo,thisCycle,gaps,recordGap,recordStart,recordEnd,avgGap,currentGap,beatingRecord,nearRecord,thisMonth,bestMonth,bestMonthKey,total:log.length};
+  const avgGap=gaps.length?Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length):null;
+  const currentGap=daysAgo;
+  const beatingRecord=(currentGap!=null&&recordGap>0&&currentGap>recordGap);
+  const nearRecord=(currentGap!=null&&recordGap>0&&!beatingRecord&&(recordGap-currentGap)<=2);
+  const total=entries.length;
+  const inCycle = cycleStart?entries.filter(e=>{const dt=parseD(e.date);return dt>=cycleStart && dt<=today;}):[];
+  const thisCycleEntries=inCycle.length;
+  const thisCycleDays=[...new Set(inCycle.map(e=>e.date))].length;
+  const month=todayStr.slice(0,7);
+  const thisMonth=entries.filter(e=>e.date.slice(0,7)===month).length;
+  const mc={}; entries.forEach(e=>{const k=e.date.slice(0,7); mc[k]=(mc[k]||0)+1;});
+  let bestMonth=0,bestMonthKey=null; Object.entries(mc).forEach(([k,v])=>{ if(v>bestMonth){bestMonth=v;bestMonthKey=k;} });
+  return {entries,dayset,loggedToday,last,daysAgo,gaps,recordGap,recordStart,recordEnd,avgGap,currentGap,beatingRecord,nearRecord,total,thisCycleEntries,thisCycleDays,thisMonth,bestMonth,bestMonthKey};
 }
 
-function chicNudge(cd,pred){
-  // playful, never nagging — priority order. Chic Chic is anytime, never tied to a window.
+function chicTier(days){
+  if(days<=0) return {t:'Get Chic Chic ASAP',e:'🚨',cls:'asap'};
+  if(days<5)  return {t:'The fire is fading',e:'🥶',cls:'cold'};
+  if(days<=10) return {t:'Needs more Chic Chic',e:'👀',cls:'meh'};
+  if(days<=15) return {t:'Excellent bonding',e:'💕',cls:'good'};
+  return {t:'Super bond',e:'🔥',cls:'super'};
+}
+
+function isCongrats(pred,cd){
+  if(!pred) return false;
+  if(pred.daysSince<30) return false;
+  const ovDayDate=pred.ovDateCur;
+  const lo=addDays(ovDayDate,-4), hi=addDays(ovDayDate,3);
+  return cd.entries.some(e=>{ const dt=parseD(e.date); return dt>=lo && dt<=hi; });
+}
+
+function vibe(cd,pred){
+  if(isCongrats(pred,cd)) return {emoji:'🎉',head:'Congrats, Mom & Dad?',sub:'Chic Chic landed in the Date Night window and the period is 30+ days late. A cheeky guess — go check! 😄',grad:'linear-gradient(135deg,#4a2f6e,#241436)',color:'#e7caff'};
+  const t=chicTier(cd.thisCycleDays);
+  const m={
+    asap:{grad:'linear-gradient(135deg,#5a1f2a,#2a0e16)',color:'#f3a8b6'},
+    cold:{grad:'linear-gradient(135deg,#1f3550,#0e1a2a)',color:'#a6cdee'},
+    meh :{grad:'linear-gradient(135deg,#3a3012,#1f1a0a)',color:'#ead592'},
+    good:{grad:'linear-gradient(135deg,#5a2a44,#2a1320)',color:'#f2afd2'},
+    super:{grad:'linear-gradient(135deg,#5a341a,#2a1708)',color:'#f3b673'},
+  }[t.cls];
+  return {emoji:t.e,head:t.t,sub:`${cd.thisCycleDays} day${cd.thisCycleDays===1?'':'s'} of Chic Chic this cycle`,grad:m.grad,color:m.color};
+}
+
+function chicNudge(cd){
   if(cd.loggedToday) return {t:`Logged today 🎉 — keep it playful`, cls:'love'};
   if(cd.beatingRecord) return {t:`🏆 New record stretch — ${cd.currentGap} days, longest yet. Bar's officially set.`, cls:'warn'};
   if(cd.nearRecord){ const g=cd.recordGap-cd.currentGap; return {t: g<=0?`👀 About to match your longest stretch ever (${cd.recordGap}d)… really?`:`👀 ${g} day${g===1?'':'s'} from your longest stretch ever (${cd.recordGap}d)… really gonna let it happen?`, cls:'warn'}; }
-  if(cd.thisCycle>=2 && cd.avgGap!=null && cd.currentGap!=null && cd.currentGap<=cd.avgGap) return {t:`Nice rhythm — ${cd.thisCycle} this cycle, right on pace ✨`, cls:'love'};
   return null;
 }
-function monthName(k){ if(!k) return ''; const [y,m]=k.split('-'); return MONTHS[parseInt(m)-1].slice(0,3)+" '"+y.slice(2); }
 
-// which phase a calendar date falls in (uses real gaps in the past, projection in the future)
-function phaseForDate(date,d,st){
-  if(st.dates.length===0) return null;
-  const P=d.periodLen, L=st.predicted, dates=st.dates;
-  let cs,len,predicted=false;
-  if(date<dates[0]){
-    let s=dates[0]; while(date<s){ s=addDays(s,-L); } cs=s; len=L; predicted=true;
-  } else {
-    let idx=0; for(let i=0;i<dates.length;i++){ if(dates[i]<=date) idx=i; }
-    if(idx<dates.length-1){ cs=dates[idx]; len=Math.round((dates[idx+1]-dates[idx])/DAY); }
-    else { let s=dates[idx]; while(date>=addDays(s,L)){ s=addDays(s,L); predicted=true; } cs=s; len=L; }
-  }
-  const dayInCycle=Math.floor((date-cs)/DAY)+1;
-  let idx=phaseIdx(dayInCycle,len,P);
-  if(dayInCycle>len) idx=3;
-  const isStart=dates.some(dd=>dd.getTime()===date.getTime());
-  return {idx,isStart,predicted,dayInCycle,len};
-}
-
-/* ---------- sync ---------- */
+/* ---------- sync (Pantry ID baked in) ---------- */
 function setSync(state,text){
   const el=document.getElementById('syncLine'); if(!el) return;
   const cls=state==='ok'?'ok':state==='err'?'err':state==='load'?'load':'';
   el.innerHTML=`<span class="sdot ${cls}"></span>${text}`;
 }
 async function syncPull(silent){
-  const d=loadLocal(); if(!d||!d.pantryId) return;
+  const d=loadLocal(); if(!d) return;
   if(!silent) setSync('load','Syncing…');
   try{
-    const r=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
+    const r=await fetch(`${PANTRY}/${PANTRY_ID}/basket/${BASKET}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw 0;
     const rm=await r.json();
-    const starts=[...new Set([...(d.starts||[]),...(rm.starts|| (rm.start?[rm.start]:[]))])].sort();
-    const log=[...new Set([...(d.log||[]),...(rm.log||[])])].sort();
-    const merged={...d, starts, log,
-      periodLen: typeof rm.periodLen==='number'?rm.periodLen:d.periodLen,
-      cycleSeed: typeof rm.cycleSeed==='number'?rm.cycleSeed:d.cycleSeed,
-      updatedAt: rm.updatedAt};
+    const starts=[...new Set([...(d.starts||[]),...(rm.starts||(rm.start?[rm.start]:[]))])].sort();
+    const remoteEntries = Array.isArray(rm.entries)?rm.entries:(Array.isArray(rm.log)?rm.log:[]);
+    const map={};
+    [...(d.entries||[]),...remoteEntries].forEach(e=>{ const o=(typeof e==='string')?{id:e+'-0',date:e,aj:0,ni:0}:e; if(o&&o.date) map[o.id||uid(o.date)]=o; });
+    const entries=Object.values(map);
+    const merged=normalize({...d, starts, entries, periodLen: typeof rm.periodLen==='number'?rm.periodLen:d.periodLen, cycleSeed: typeof rm.cycleSeed==='number'?rm.cycleSeed:d.cycleSeed, updatedAt: rm.updatedAt});
     saveLocal(merged); render(true);
     const u=rm.updatedAt?new Date(rm.updatedAt):null;
     setSync('ok',u?`Synced · ${fmt(u)}`:'Synced');
   }catch(e){ setSync('err','Offline — showing last saved'); }
 }
 async function syncPush(d){
-  if(!d.pantryId) return;
   setSync('load','Saving…');
   try{
     const st=stats(d);
     const lastStart=st.dates.length?isoLocal(st.dates[st.dates.length-1]):null;
-    const body={starts:d.starts,log:d.log,periodLen:d.periodLen,cycleSeed:d.cycleSeed,
-      start:lastStart,cycleLen:st.predicted,updatedAt:new Date().toISOString()};
-    const r=await fetch(`${PANTRY}/${d.pantryId.trim()}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const chicDates=[...new Set(d.entries.map(e=>e.date))].sort();
+    const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, start:lastStart, cycleLen:st.predicted, updatedAt:new Date().toISOString()};
+    const r=await fetch(`${PANTRY}/${PANTRY_ID}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!r.ok) throw 0;
     setSync('ok','Saved & synced');
   }catch(e){ setSync('err','Saved on phone — sync failed'); }
@@ -413,23 +438,20 @@ function render(keepSync){
   const conf=confidence(st);
   const p=PHASES[pred.pIdx];
   const cd=chicInfo(d,pred.lastStart);
+  const vb=vibe(cd,pred);
 
-  // ring
   const R=100, CIRC=2*Math.PI*R, frac=Math.min(1,pred.dayInCycle/pred.L), off=CIRC*(1-frac);
-  // bar segments
   const ov=pred.L-14;
   const segs=[{w:pred.P,c:PCOL[0]},{w:(ov-pred.P-3),c:PCOL[1]},{w:4,c:PCOL[2]},{w:pred.L-(ov+1),c:PCOL[3]}];
   const tot=segs.reduce((a,s)=>a+Math.max(0,s.w),0);
   const barHTML=segs.map(s=>`<div class="seg" style="width:${Math.max(0,s.w)/tot*100}%;background:${s.c}"></div>`).join('');
   const markPos=Math.min(99,frac*100);
 
-  // nudge banner
   let banner='';
   if(pred.isLate) banner=`<div class="banner late">⏰ Period is ${pred.daysLate} day${pred.daysLate===1?'':'s'} late${pred.daysLate>=7?' — might be worth a check':''}</div>`;
-  else if(pred.daysToNext<=2) banner=`<div class="banner warn">⛈️ Code Red likely ${pred.daysToNext===0?'today':pred.daysToNext===1?'tomorrow':'in 2 days'} — stock up on the essentials</div>`;
-  else if(pred.inFertile||pred.daysToOv===0) banner=`<div class="banner love">💘 Fertile window is open — Date Night time</div>`;
+  else if(pred.daysToNext<=2) banner=`<div class="banner warn">⛈️ Code Red likely ${pred.daysToNext===0?'today':pred.daysToNext===1?'tomorrow':'in 2 days'} — stock up</div>`;
+  else if(pred.inFertile||pred.daysToOv===0) banner=`<div class="banner love">💘 Date Night window is open</div>`;
 
-  // confidence/range text
   const rangeTxt = st.n ? `${fmt(pred.lo)} – ${fmt(pred.hi)} window` : 'rough window, log more to refine';
   const nextBig = pred.isLate ? `${pred.daysLate}d late` : (pred.daysToNext===0?'Today':pred.daysToNext===1?'Tomorrow':`in ${pred.daysToNext} days`);
 
@@ -438,7 +460,12 @@ function render(keepSync){
       <div class="brand"><span class="moon"></span> Chic Chic</div>
       <div class="gear" onclick="openSheet()">⚙</div>
     </div>
-    <div class="sync" id="syncLine"><span class="sdot ${d.pantryId?'ok':''}"></span>${d.pantryId?'Synced':'This phone only'}</div>
+    <div class="sync" id="syncLine"><span class="sdot"></span>Syncing…</div>
+
+    <div class="status" style="background:${vb.grad};color:${vb.color}">
+      <div class="se">${vb.emoji}</div>
+      <div><div class="sh">${vb.head}</div><div class="ss">${vb.sub}</div></div>
+    </div>
 
     ${banner}
 
@@ -456,24 +483,13 @@ function render(keepSync){
 
     <div class="quip">${p.quip}</div>
 
-    <div class="pred">
-      <div class="row1">
-        <div>
-          <div class="lab">Next period</div>
-          <div class="big">${nextBig}</div>
-          <div class="range">~ ${fmtFull(pred.nextStart)} · ${rangeTxt}</div>
-        </div>
-        <span class="conf ${conf.cls}">${conf.label}</span>
-      </div>
-    </div>
-
     <div class="chic">
       <div><div class="chic-k">✨ Chic Chic</div>
       <div class="chic-v">${cd.loggedToday?'Today 🎉':(cd.daysAgo!=null?cd.daysAgo+' day'+(cd.daysAgo===1?'':'s')+' ago':'None logged yet')}</div>
-      <div class="chic-sub">${cd.last?'Last on '+fmt(cd.last)+' · '+cd.thisCycle+' this cycle':'Add days in settings ⚙'}</div></div>
-      <button class="chic-btn" onclick="openSheet()">＋ Add</button>
+      <div class="chic-sub">${cd.last?'Last on '+fmt(cd.last)+' · '+cd.thisCycleEntries+' this cycle':'Add one in settings ⚙'}</div></div>
+      <button class="chic-btn" onclick="openSheet()">＋ Log</button>
     </div>
-    ${(()=>{const n=chicNudge(cd,pred);return n?`<div class="banner ${n.cls}">${n.t}</div>`:'';})()}
+    ${(()=>{const n=chicNudge(cd);return n?`<div class="banner ${n.cls}">${n.t}</div>`:'';})()}
     ${cd.total>=2?`<div class="ccstats">
       <div class="ccs"><div class="ccs-v">${cd.currentGap}d</div><div class="ccs-k">Current gap</div></div>
       <div class="ccs"><div class="ccs-v" style="color:${cd.beatingRecord?'var(--amber)':'var(--txt)'}">${Math.max(cd.recordGap,cd.beatingRecord?cd.currentGap:0)}d</div><div class="ccs-k">Longest ever</div></div>
@@ -510,13 +526,17 @@ function render(keepSync){
     <div class="section-t">Her patterns</div>
     ${insightsHTML(d,st)}
 
-    <div class="section-t">Calendar</div>
+    <div class="section-t">Cycle calendar</div>
     <div id="cal"></div>
 
-    <div class="foot">Predictions learn from her logged dates and are estimates — real cycles vary, and big swings have many normal causes (stress, travel, illness). Not medical advice or birth control.<br><br>Made with 🤍 for the two of you.</div>
+    <div class="section-t">Chic Chic calendar ✨</div>
+    <div id="chiccal"></div>
+
+    <div class="foot">Predictions learn from logged dates and are estimates — real cycles vary, and big swings have many normal causes. Not medical advice or birth control.<br><br>Made with 🤍 for the two of you.</div>
   `;
   renderCalendar(d,st,pred);
-  if(!keepSync && d.pantryId) syncPull(true);
+  renderChicCalendar(d);
+  if(!keepSync) syncPull(true);
 }
 
 function insightsHTML(d,st){
@@ -528,15 +548,9 @@ function insightsHTML(d,st){
     <div class="stat"><div class="k">Regularity</div><div class="v" style="font-size:15px">${reg}</div><div class="sub">${st.n>=1?'varies '+st.min+'–'+st.max+'d':''}</div></div>
     <div class="stat"><div class="k">Cycles logged</div><div class="v">${st.n}</div><div class="sub">${st.dates.length} start dates</div></div>
   </div>`;
-  // history bars (most recent first)
-  const maxL=Math.max(...st.lengths,1);
-  let rows='';
-  for(let i=st.lengths.length-1;i>=0;i--){
-    const a=st.dates[i], b=st.dates[i+1], len=st.lengths[i];
-    rows+=`<div class="hrow"><div class="hd">${fmt(a)} → ${fmt(b)}</div>
-      <div class="htrack"><div class="hfill" style="width:${Math.round(len/maxL*100)}%"></div></div>
-      <div class="hlen">${len}d</div></div>`;
-  }
+  const maxL=Math.max(...st.lengths,1); let rows='';
+  for(let i=st.lengths.length-1;i>=0;i--){ const a=st.dates[i],b=st.dates[i+1],len=st.lengths[i];
+    rows+=`<div class="hrow"><div class="hd">${fmt(a)} → ${fmt(b)}</div><div class="htrack"><div class="hfill" style="width:${Math.round(len/maxL*100)}%"></div></div><div class="hlen">${len}d</div></div>`; }
   return avgGrid + `<div class="hist">${rows}</div>`;
 }
 
@@ -544,9 +558,9 @@ function renderCalendar(d,st,pred){
   const box=document.getElementById('cal'); if(!box) return;
   if(!calMonth) calMonth=new Date(midnight(new Date()).getFullYear(),midnight(new Date()).getMonth(),1);
   const y=calMonth.getFullYear(), m=calMonth.getMonth();
-  const first=new Date(y,m,1), startDow=first.getDay(), days=new Date(y,m+1,0).getDate();
+  const startDow=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
   const today=midnight(new Date());
-  const logSet=new Set(d.log);
+  const startSet=new Set(d.starts);
   const dows=['S','M','T','W','T','F','S'];
   let cells=dows.map(x=>`<div class="cal-dow">${x}</div>`).join('');
   for(let i=0;i<startDow;i++) cells+=`<div></div>`;
@@ -554,29 +568,61 @@ function renderCalendar(d,st,pred){
     const date=midnight(new Date(y,m,day));
     const ph=phaseForDate(date,d,st);
     let alpha = ph?(ph.predicted?'2e':'55'):null;
-    if(ph && ph.idx===2){ const ov=ph.len-14, pos=ph.dayInCycle-ov; alpha=(pos===-1||pos===0)?'cc':(pos===-2)?'55':'33'; }
+    if(ph && ph.idx===2){ const o=ph.len-14, pos=ph.dayInCycle-o; alpha=(pos===-1||pos===0)?'cc':(pos===-2)?'55':'33'; }
     const bg = ph?PCOL[ph.idx]+alpha:'transparent';
     const isToday=date.getTime()===today.getTime();
-    const isStart=ph&&ph.isStart;
-    const cc=logSet.has(isoLocal(date));
-    cells+=`<div class="cal-cell${isToday?' today':''}${isStart?' start':''}" style="background:${bg}">${day}${cc?'<span class="cal-cc"></span>':''}</div>`;
+    const isStart=startSet.has(isoLocal(date));
+    cells+=`<div class="cal-cell${isToday?' today':''}${isStart?' start':''}" style="background:${bg}">${day}</div>`;
   }
   box.innerHTML=`<div class="cal">
-    <div class="cal-nav">
-      <button onclick="calStep(-1)">‹</button>
-      <div class="cal-title">${MONTHS[m]} ${y}</div>
-      <button onclick="calStep(1)">›</button>
-    </div>
+    <div class="cal-nav"><button onclick="calStep(-1)">‹</button><div class="cal-title">${MONTHS[m]} ${y}</div><button onclick="calStep(1)">›</button></div>
     <div class="cal-grid">${cells}</div>
     <div class="legend" style="margin-top:12px">${PHASES.map(x=>`<div class="lg"><span class="sw" style="background:${x.color}"></span>${x.label}</div>`).join('')}</div>
-    <div class="cal-pred-note">Bright = logged · faded = predicted · ✨dot = Chic Chic · ⬜ring = period start</div>
+    <div class="cal-pred-note">Bright = logged · faded = predicted · ⬜ring = period start · Date Night brightest at peak</div>
   </div>`;
 }
-function calStep(n){
-  if(!calMonth) calMonth=new Date();
-  calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+n,1);
-  const d=loadLocal(); const st=stats(d); renderCalendar(d,st,prediction(d,st));
+function calStep(n){ if(!calMonth) calMonth=new Date(); calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+n,1); const d=loadLocal(); const st=stats(d); renderCalendar(d,st,prediction(d,st)); }
+
+function phaseForDate(date,d,st){
+  if(st.dates.length===0) return null;
+  const P=d.periodLen, L=st.predicted, dates=st.dates;
+  let cs,len,predicted=false;
+  if(date<dates[0]){ let s=dates[0]; while(date<s){ s=addDays(s,-L); } cs=s; len=L; predicted=true; }
+  else { let idx=0; for(let i=0;i<dates.length;i++){ if(dates[i]<=date) idx=i; }
+    if(idx<dates.length-1){ cs=dates[idx]; len=Math.round((dates[idx+1]-dates[idx])/DAY); }
+    else { let s=dates[idx]; while(date>=addDays(s,L)){ s=addDays(s,L); predicted=true; } cs=s; len=L; } }
+  const dayInCycle=Math.floor((date-cs)/DAY)+1;
+  let idx=phaseIdx(dayInCycle,len,P); if(dayInCycle>len) idx=3;
+  const isStart=dates.some(dd=>dd.getTime()===date.getTime());
+  return {idx,isStart,predicted,dayInCycle,len};
 }
+
+function renderChicCalendar(d){
+  const box=document.getElementById('chiccal'); if(!box) return;
+  if(!chicCalMonth) chicCalMonth=new Date(midnight(new Date()).getFullYear(),midnight(new Date()).getMonth(),1);
+  const y=chicCalMonth.getFullYear(), m=chicCalMonth.getMonth();
+  const startDow=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  const today=midnight(new Date());
+  const counts={}; d.entries.forEach(e=>{ counts[e.date]=(counts[e.date]||0)+1; });
+  const dows=['S','M','T','W','T','F','S'];
+  let cells=dows.map(x=>`<div class="cal-dow">${x}</div>`).join('');
+  for(let i=0;i<startDow;i++) cells+=`<div></div>`;
+  let monthTotal=0;
+  for(let day=1;day<=days;day++){
+    const ds=isoLocal(midnight(new Date(y,m,day)));
+    const c=counts[ds]||0; monthTotal+=c;
+    const isToday=midnight(new Date(y,m,day)).getTime()===today.getTime();
+    const bg = c>0 ? `rgba(232,96,122,${Math.min(.25+c*0.18,.85)})` : 'transparent';
+    cells+=`<div class="ccell${isToday?' today':''}" style="background:${bg}" onclick="logOn('${ds}')">${day}${c>0?`<span class="badge">${c}×</span>`:''}</div>`;
+  }
+  box.innerHTML=`<div class="cal">
+    <div class="cal-nav"><button onclick="chicCalStep(-1)">‹</button><div class="cal-title">${MONTHS[m]} ${y} · ${monthTotal}×</div><button onclick="chicCalStep(1)">›</button></div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-pred-note">Tap a day to log Chic Chic for it · number = times that day</div>
+  </div>`;
+}
+function chicCalStep(n){ if(!chicCalMonth) chicCalMonth=new Date(); chicCalMonth=new Date(chicCalMonth.getFullYear(),chicCalMonth.getMonth()+n,1); renderChicCalendar(loadLocal()); }
+function logOn(ds){ openSheet(); document.getElementById('chicInput').value=ds; }
 
 function welcome(){
   return `<div class="top"><div class="brand"><span class="moon"></span> Chic Chic</div></div>
@@ -587,16 +633,23 @@ function welcome(){
 }
 
 /* ---------- settings ---------- */
+function renderStars(who){
+  const v = who==='Aj'?editAj:editNi;
+  const box=document.getElementById(who==='Aj'?'starsAj':'starsNi'); if(!box) return;
+  box.innerHTML=[1,2,3,4,5].map(n=>`<span class="star ${n<=v?'on':''}" onclick="setStar('${who}',${n})">⭐</span>`).join('');
+}
+function setStar(who,n){ if(who==='Aj') editAj=(editAj===n?0:n); else editNi=(editNi===n?0:n); renderStars(who); }
+
 function openSheet(){
   const d=loadLocal();
   editStarts = d?d.starts.slice():[];
-  editLog = d?d.log.slice():[];
+  editEntries = d?d.entries.map(e=>({...e})):[];
+  editAj=0; editNi=0;
   document.getElementById('periodLen').value = d?d.periodLen:5;
   document.getElementById('cycleSeed').value = d?d.cycleSeed:28;
-  document.getElementById('pantryId').value = d?(d.pantryId||''):'';
   document.getElementById('startInput').value = isoLocal(new Date());
   document.getElementById('chicInput').value = isoLocal(new Date());
-  renderStartChips(); renderChicChips();
+  renderStartChips(); renderChicChips(); renderStars('Aj'); renderStars('Ni');
   document.getElementById('sheet').classList.add('show');
 }
 function closeSheet(){ document.getElementById('sheet').classList.remove('show'); render(); }
@@ -604,31 +657,48 @@ function closeSheet(){ document.getElementById('sheet').classList.remove('show')
 function renderStartChips(){
   const box=document.getElementById('startChips'); if(!box) return;
   const s=editStarts.slice().sort().reverse();
-  box.innerHTML = s.length ? s.map(x=>`<span class="chip-x">${fmt(parseD(x))} '${x.slice(2,4)}<button type="button" onclick="removeStart('${x}')">×</button></span>`).join('')
-    : `<span style="font-size:12px;color:var(--faint)">No dates yet</span>`;
+  box.innerHTML = s.length ? s.map(x=>`<span class="chip-x">${fmt(parseD(x))} '${x.slice(2,4)}<button type="button" onclick="removeStart('${x}')">×</button></span>`).join('') : `<span style="font-size:12px;color:var(--faint)">No dates yet</span>`;
 }
 function addStart(){ const v=document.getElementById('startInput').value; if(v&&!editStarts.includes(v)) editStarts.push(v); renderStartChips(); }
 function removeStart(s){ editStarts=editStarts.filter(x=>x!==s); renderStartChips(); }
 
+function starStr(n){ return n>0 ? '★'.repeat(n) : '–'; }
 function renderChicChips(){
   const box=document.getElementById('chicChips'); if(!box) return;
-  const s=editLog.slice().sort().reverse();
-  box.innerHTML = s.length ? s.map(x=>`<span class="chip-x">${fmt(parseD(x))}<button type="button" onclick="removeChic('${x}')">×</button></span>`).join('')
-    : `<span style="font-size:12px;color:var(--faint)">No days added yet</span>`;
+  const s=editEntries.slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
+  box.innerHTML = s.length ? s.map(e=>`<span class="chip-x">${fmt(parseD(e.date))} · Aj ${starStr(e.aj)} Ni ${starStr(e.ni)}<button type="button" onclick="removeChic('${e.id}')">×</button></span>`).join('') : `<span style="font-size:12px;color:var(--faint)">No entries yet</span>`;
 }
-function addChic(){ const v=document.getElementById('chicInput').value; if(v&&!editLog.includes(v)) editLog.push(v); renderChicChips(); }
-function removeChic(s){ editLog=editLog.filter(x=>x!==s); renderChicChips(); }
+function addChic(){
+  const v=document.getElementById('chicInput').value; if(!v) return;
+  editEntries.push({id:uid(v), date:v, aj:editAj, ni:editNi});
+  editAj=0; editNi=0; renderStars('Aj'); renderStars('Ni'); renderChicChips();
+}
+function removeChic(id){ editEntries=editEntries.filter(e=>e.id!==id); renderChicChips(); }
 
 async function save(){
   if(editStarts.length===0){ alert('Add at least one period start date 🙂'); return; }
   const periodLen=Math.max(2,Math.min(10,parseInt(document.getElementById('periodLen').value)||5));
   const cycleSeed=Math.max(20,Math.min(45,parseInt(document.getElementById('cycleSeed').value)||28));
-  const pantryId=document.getElementById('pantryId').value.trim();
-  const d=normalize({starts:editStarts,log:editLog,periodLen,cycleSeed,pantryId});
+  const d=normalize({starts:editStarts, entries:editEntries, periodLen, cycleSeed});
   saveLocal(d);
   document.getElementById('sheet').classList.remove('show');
-  calMonth=null; render(true);
-  if(pantryId) await syncPush(d);
+  calMonth=null; chicCalMonth=null; render(true);
+  await syncPush(d);
+}
+
+/* ---------- export / import ---------- */
+function dl(blob,name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),1500); }
+function exportJSON(){ const d=loadLocal()||{}; dl(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}), `chic-chic-backup-${isoLocal(new Date())}.json`); }
+function exportCSV(){
+  const d=loadLocal()||{entries:[]}; const rows=[['date','aj_stars','ni_stars']];
+  (d.entries||[]).forEach(e=>rows.push([e.date,e.aj,e.ni]));
+  dl(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}), `chic-chic-${isoLocal(new Date())}.csv`);
+}
+function importJSON(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const d=normalize(JSON.parse(r.result)); if(!d){alert('Invalid file');return;} saveLocal(d); calMonth=null;chicCalMonth=null; render(true); syncPush(d); alert('Backup restored ✓'); }catch(e){ alert('Could not read that file'); } };
+  r.readAsText(f); ev.target.value='';
 }
 
 document.getElementById('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') closeSheet(); });

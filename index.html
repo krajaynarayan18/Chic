@@ -63,6 +63,12 @@
   .chic-btn{flex:none;background:linear-gradient(135deg,#e8607a,#d98bb0);color:#2a0d1a;border:none;border-radius:13px;padding:12px 16px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
   .chic-btn:active{transform:scale(.95)}
 
+  .ccstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+  .ccs{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 8px;text-align:center}
+  .ccs-v{font-size:18px;font-weight:700;letter-spacing:.2px}
+  .ccs-k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+  .ccnote{font-size:11px;color:var(--faint);text-align:center;margin-bottom:14px;line-height:1.5}
+
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
   .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
   .stat .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px;margin-bottom:7px}
@@ -307,8 +313,40 @@ function chicInfo(d,cycleStart){
   let last=null,daysAgo=null;
   if(log.length){ last=parseD(log[log.length-1]); daysAgo=Math.round((today-last)/DAY); }
   const thisCycle=cycleStart?log.filter(s=>{const dt=parseD(s);return dt>=cycleStart && dt<=today;}).length:0;
-  return {log,loggedToday,last,daysAgo,thisCycle};
+
+  // gaps between consecutive logged days
+  const dts=log.map(parseD);
+  const gaps=[];
+  for(let i=1;i<dts.length;i++) gaps.push(Math.round((dts[i]-dts[i-1])/DAY));
+  // longest PAST gap (between two actual sessions) and when it happened
+  let recordGap=0, recordStart=null, recordEnd=null;
+  for(let i=0;i<gaps.length;i++){ if(gaps[i]>recordGap){ recordGap=gaps[i]; recordStart=dts[i]; recordEnd=dts[i+1]; } }
+  const avgGap = gaps.length ? Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length) : null;
+  const currentGap = daysAgo;            // ongoing stretch since last session
+  // is the ongoing stretch challenging / beating the record?
+  const beatingRecord = (currentGap!=null && recordGap>0 && currentGap>recordGap);
+  const nearRecord = (currentGap!=null && recordGap>0 && !beatingRecord && (recordGap-currentGap)<=2);
+  // this month + best month
+  const monthKey=s=>s.slice(0,7);
+  const monthCounts={};
+  log.forEach(s=>{ const k=monthKey(s); monthCounts[k]=(monthCounts[k]||0)+1; });
+  const thisMonth = monthCounts[isoLocal(today).slice(0,7)] || 0;
+  let bestMonth=0, bestMonthKey=null;
+  Object.entries(monthCounts).forEach(([k,v])=>{ if(v>bestMonth){ bestMonth=v; bestMonthKey=k; } });
+
+  return {log,loggedToday,last,daysAgo,thisCycle,gaps,recordGap,recordStart,recordEnd,avgGap,currentGap,beatingRecord,nearRecord,thisMonth,bestMonth,bestMonthKey,total:log.length};
 }
+
+function chicNudge(cd,pred){
+  // playful, never nagging — priority order
+  if(cd.loggedToday) return {t:`Logged today 🎉 — keep the streak playful`, cls:'love'};
+  if(cd.beatingRecord) return {t:`🏆 New record stretch — ${cd.currentGap} days, longest yet. Bar's officially set.`, cls:'warn'};
+  if(cd.nearRecord) return {t:`👀 ${cd.recordGap-cd.currentGap+1>1?(cd.recordGap-cd.currentGap)+' days':'a day'} from your longest stretch ever (${cd.recordGap}d)… really gonna let it happen?`, cls:'warn'};
+  if(pred && (pred.inFertile||pred.daysToOv===0) && cd.currentGap!=null && cd.currentGap>=3) return {t:`🔥 Heatwave's open and it's been ${cd.currentGap} days — good timing 😏`, cls:'love'};
+  if(cd.thisCycle>=2 && cd.avgGap!=null && cd.currentGap!=null && cd.currentGap<=cd.avgGap) return {t:`Nice rhythm — ${cd.thisCycle} this cycle, right on pace ✨`, cls:'love'};
+  return null;
+}
+function monthName(k){ if(!k) return ''; const [y,m]=k.split('-'); return MONTHS[parseInt(m)-1].slice(0,3)+" '"+y.slice(2); }
 
 // which phase a calendar date falls in (uses real gaps in the past, projection in the future)
 function phaseForDate(date,d,st){
@@ -436,6 +474,15 @@ function render(keepSync){
       <div class="chic-sub">${cd.last?'Last on '+fmt(cd.last)+' · '+cd.thisCycle+' this cycle':'Add days in settings ⚙'}</div></div>
       <button class="chic-btn" onclick="openSheet()">＋ Add</button>
     </div>
+    ${(()=>{const n=chicNudge(cd,pred);return n?`<div class="banner ${n.cls}">${n.t}</div>`:'';})()}
+    ${cd.total>=2?`<div class="ccstats">
+      <div class="ccs"><div class="ccs-v">${cd.currentGap}d</div><div class="ccs-k">Current gap</div></div>
+      <div class="ccs"><div class="ccs-v" style="color:${cd.beatingRecord?'var(--amber)':'var(--txt)'}">${Math.max(cd.recordGap,cd.beatingRecord?cd.currentGap:0)}d</div><div class="ccs-k">Longest ever</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.avgGap!=null?cd.avgGap+'d':'—'}</div><div class="ccs-k">Avg gap</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.thisMonth}</div><div class="ccs-k">This month</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.bestMonth}</div><div class="ccs-k">Best month</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.total}</div><div class="ccs-k">All time</div></div>
+    </div>${cd.recordStart?`<div class="ccnote">Longest dry spell: ${cd.recordGap} days (${fmt(cd.recordStart)} → ${fmt(cd.recordEnd)})${cd.bestMonthKey?' · best month '+monthName(cd.bestMonthKey):''}</div>`:''}`:''}
 
     <div class="grid2">
       <div class="stat"><div class="k">💘 Date Night</div>

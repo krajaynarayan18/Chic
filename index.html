@@ -247,7 +247,7 @@ function parseD(s){return midnight(new Date(s+'T00:00:00'));}
 function phaseIdx(dayInCycle,C,P){
   const ov=C-14;
   if(dayInCycle<=P) return 0;
-  if(dayInCycle<ov-1) return 1;
+  if(dayInCycle<ov-2) return 1;
   if(dayInCycle<=ov+1) return 2;
   return 3;
 }
@@ -326,7 +326,7 @@ function phaseForDate(date,d,st){
   let idx=phaseIdx(dayInCycle,len,P);
   if(dayInCycle>len) idx=3;
   const isStart=dates.some(dd=>dd.getTime()===date.getTime());
-  return {idx,isStart,predicted};
+  return {idx,isStart,predicted,dayInCycle,len};
 }
 
 /* ---------- sync ---------- */
@@ -381,7 +381,7 @@ function render(keepSync){
   const R=100, CIRC=2*Math.PI*R, frac=Math.min(1,pred.dayInCycle/pred.L), off=CIRC*(1-frac);
   // bar segments
   const ov=pred.L-14;
-  const segs=[{w:pred.P,c:PCOL[0]},{w:(ov-1)-pred.P,c:PCOL[1]},{w:3,c:PCOL[2]},{w:pred.L-(ov+1),c:PCOL[3]}];
+  const segs=[{w:pred.P,c:PCOL[0]},{w:(ov-pred.P-3),c:PCOL[1]},{w:4,c:PCOL[2]},{w:pred.L-(ov+1),c:PCOL[3]}];
   const tot=segs.reduce((a,s)=>a+Math.max(0,s.w),0);
   const barHTML=segs.map(s=>`<div class="seg" style="width:${Math.max(0,s.w)/tot*100}%;background:${s.c}"></div>`).join('');
   const markPos=Math.min(99,frac*100);
@@ -455,7 +455,7 @@ function render(keepSync){
 
     <div class="section-t">The four moods</div>
     <div class="phaselist">
-      ${PHASES.map((x,i)=>{const o=pred.L-14;const r=i===0?`1–${pred.P}`:i===1?`${pred.P+1}–${o-2}`:i===2?`${o-1}–${o+1}`:`${o+2}–${pred.L}`;
+      ${PHASES.map((x,i)=>{const o=pred.L-14;const r=i===0?`1–${pred.P}`:i===1?`${pred.P+1}–${o-3}`:i===2?`${o-2}–${o+1}`:`${o+2}–${pred.L}`;
         return `<div class="pcard ${i===pred.pIdx?'active':''}"><div class="pemoji">${x.emoji}</div>
         <div class="pmeta"><div class="pname" style="color:${i===pred.pIdx?x.color:'var(--txt)'}">${x.label}</div><div class="pdesc">${x.short}</div></div>
         <div class="prange">Days ${r}</div></div>`;}).join('')}
@@ -507,7 +507,9 @@ function renderCalendar(d,st,pred){
   for(let day=1;day<=days;day++){
     const date=midnight(new Date(y,m,day));
     const ph=phaseForDate(date,d,st);
-    const bg = ph?PCOL[ph.idx]+(ph.predicted?'2e':'55'):'transparent';
+    let alpha = ph?(ph.predicted?'2e':'55'):null;
+    if(ph && ph.idx===2){ const ov=ph.len-14, pos=ph.dayInCycle-ov; alpha=(pos===-1||pos===0)?'cc':(pos===-2)?'55':'33'; }
+    const bg = ph?PCOL[ph.idx]+alpha:'transparent';
     const isToday=date.getTime()===today.getTime();
     const isStart=ph&&ph.isStart;
     const cc=logSet.has(isoLocal(date));

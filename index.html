@@ -338,11 +338,10 @@ function chicInfo(d,cycleStart){
 }
 
 function chicNudge(cd,pred){
-  // playful, never nagging — priority order
-  if(cd.loggedToday) return {t:`Logged today 🎉 — keep the streak playful`, cls:'love'};
+  // playful, never nagging — priority order. Chic Chic is anytime, never tied to a window.
+  if(cd.loggedToday) return {t:`Logged today 🎉 — keep it playful`, cls:'love'};
   if(cd.beatingRecord) return {t:`🏆 New record stretch — ${cd.currentGap} days, longest yet. Bar's officially set.`, cls:'warn'};
-  if(cd.nearRecord) return {t:`👀 ${cd.recordGap-cd.currentGap+1>1?(cd.recordGap-cd.currentGap)+' days':'a day'} from your longest stretch ever (${cd.recordGap}d)… really gonna let it happen?`, cls:'warn'};
-  if(pred && (pred.inFertile||pred.daysToOv===0) && cd.currentGap!=null && cd.currentGap>=3) return {t:`🔥 Heatwave's open and it's been ${cd.currentGap} days — good timing 😏`, cls:'love'};
+  if(cd.nearRecord){ const g=cd.recordGap-cd.currentGap; return {t: g<=0?`👀 About to match your longest stretch ever (${cd.recordGap}d)… really?`:`👀 ${g} day${g===1?'':'s'} from your longest stretch ever (${cd.recordGap}d)… really gonna let it happen?`, cls:'warn'}; }
   if(cd.thisCycle>=2 && cd.avgGap!=null && cd.currentGap!=null && cd.currentGap<=cd.avgGap) return {t:`Nice rhythm — ${cd.thisCycle} this cycle, right on pace ✨`, cls:'love'};
   return null;
 }

@@ -40,6 +40,18 @@
   .banner.late{background:rgba(232,96,122,.15);border:1px solid rgba(232,96,122,.35);color:#f09bb0}
   .banner.love{background:rgba(217,139,176,.15);border:1px solid rgba(217,139,176,.35);color:#eab6cf}
 
+  .ann-fest{border-radius:18px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,#7a4dae,#3a2168);border:1px solid rgba(231,198,255,.35);box-shadow:0 6px 26px rgba(122,77,174,.3)}
+  .ann-fest .af-e{font-size:30px;line-height:1;flex:none}
+  .ann-fest .af-h{font-size:17px;font-weight:800;color:#fff;letter-spacing:.2px}
+  .ann-fest .af-s{font-size:12.5px;color:#e7caff;margin-top:3px;line-height:1.4}
+
+  .connect{display:flex;flex-direction:column;align-items:center;text-align:center;padding:54px 6px 0}
+  .connect .ce{font-size:52px;margin-bottom:14px}
+  .connect h2{font-size:21px;font-weight:700;margin-bottom:8px}
+  .connect p{font-size:13.5px;color:var(--mut);line-height:1.6;margin-bottom:22px;max-width:330px}
+  .connect input{margin-bottom:14px;text-align:center;font-size:14px}
+  .connect .cnote{font-size:11.5px;color:var(--faint);margin-top:14px;line-height:1.5;max-width:330px}
+
   .hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:2px 0 22px}
   .ring{position:relative;width:230px;height:230px}
   .ring svg{transform:rotate(-90deg)}
@@ -212,6 +224,20 @@
 
     <div class="divider"></div>
     <div class="field">
+      <label>Anniversary 💍</label>
+      <input type="date" id="weddingInput">
+      <div class="hint">Your wedding date. Monthly anniversaries get a small note; the yearly one gets a celebration — on the app and the widget.</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Shared sync code</label>
+      <input type="text" id="codeField" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="hint">Both phones must use the same code to share data. Keep it private — anyone with it can see your entries. Only change this if you know what you're doing.</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
       <label>Backup &amp; restore</label>
       <div class="exp">
         <button type="button" onclick="exportJSON()">⬇︎ Backup (JSON)</button>
@@ -229,11 +255,16 @@
 
 <script>
 const LKEY='chicChic.v2';
+const CODEKEY='chicChic.code';
 const PANTRY='https://getpantry.cloud/apiv1/pantry';
-const PANTRY_ID='02f8fe61-5672-486d-8271-373da9e3600d';   // baked in — both phones share this, always syncs
+const DEFAULT_ID='02f8fe61-5672-486d-8271-373da9e3600d';   // pre-filled on the connect screen
 const BASKET='cycle';
 const DAY=86400000;
+const DEFAULT_WEDDING='2026-04-20';
 let pollTimer=null, editStarts=[], editEntries=[], editAj=0, editNi=0, calMonth=null, chicCalMonth=null;
+function getCode(){ return (localStorage.getItem(CODEKEY)||'').trim(); }
+function setCode(c){ localStorage.setItem(CODEKEY,(c||'').trim()); }
+function pantryId(){ return getCode() || DEFAULT_ID; }
 
 const PHASES=[
   {emoji:'🩸', label:'Code Red',    color:'#e8607a',
@@ -268,6 +299,7 @@ function normalize(d){
   d.entries=entries; delete d.log;
   if(typeof d.periodLen!=='number') d.periodLen=5;
   if(typeof d.cycleSeed!=='number') d.cycleSeed=(typeof d.cycleLen==='number'?d.cycleLen:28);
+  if(typeof d.wedding!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.wedding)) d.wedding=DEFAULT_WEDDING;
   return d;
 }
 
@@ -392,6 +424,33 @@ function chicNudge(cd){
   return null;
 }
 
+function ordinal(n){ const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+function annInfo(d){
+  if(!d.wedding) return null;
+  const w=parseD(d.wedding), today=midnight(new Date());
+  if(today<w) { // not married yet — count down to the wedding itself
+    const days=Math.round((w-today)/DAY);
+    return {beforeWedding:true, daysToWedding:days, wedding:w};
+  }
+  const wd=w.getDate();
+  // months together (whole months elapsed)
+  let months=(today.getFullYear()-w.getFullYear())*12+(today.getMonth()-w.getMonth());
+  if(today.getDate()<wd) months--;
+  // next monthly occurrence (same day-of-month)
+  let nm=new Date(today.getFullYear(),today.getMonth(),wd); if(nm<today||nm.getDate()!==wd) nm=new Date(today.getFullYear(),today.getMonth()+1,wd);
+  let nmMonths=(nm.getFullYear()-w.getFullYear())*12+(nm.getMonth()-w.getMonth());
+  const daysToMonthly=Math.round((nm-today)/DAY);
+  // next yearly occurrence
+  let ny=new Date(today.getFullYear(),w.getMonth(),wd); if(ny<today) ny=new Date(today.getFullYear()+1,w.getMonth(),wd);
+  const nextYears=ny.getFullYear()-w.getFullYear();
+  const daysToYearly=Math.round((ny-today)/DAY);
+  const monthlyToday=(today.getDate()===wd);
+  const yearlyToday=(today.getMonth()===w.getMonth() && today.getDate()===wd);
+  const years=Math.floor(months/12);
+  return {beforeWedding:false,wedding:w,months,years,monthlyToday,yearlyToday,
+    nextMonthly:nm,nmMonths,daysToMonthly,nextYearly:ny,nextYears,daysToYearly};
+}
+
 /* ---------- sync (Pantry ID baked in) ---------- */
 function setSync(state,text){
   const el=document.getElementById('syncLine'); if(!el) return;
@@ -399,10 +458,10 @@ function setSync(state,text){
   el.innerHTML=`<span class="sdot ${cls}"></span>${text}`;
 }
 async function syncPull(silent){
-  const d=loadLocal(); if(!d) return;
+  let d=normalize(loadLocal() || {starts:[],entries:[]});
   if(!silent) setSync('load','Syncing…');
   try{
-    const r=await fetch(`${PANTRY}/${PANTRY_ID}/basket/${BASKET}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
+    const r=await fetch(`${PANTRY}/${pantryId()}/basket/${BASKET}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw 0;
     const rm=await r.json();
     const starts=[...new Set([...(d.starts||[]),...(rm.starts||(rm.start?[rm.start]:[]))])].sort();
@@ -410,20 +469,25 @@ async function syncPull(silent){
     const map={};
     [...(d.entries||[]),...remoteEntries].forEach(e=>{ const o=(typeof e==='string')?{id:e+'-0',date:e,aj:0,ni:0}:e; if(o&&o.date) map[o.id||uid(o.date)]=o; });
     const entries=Object.values(map);
-    const merged=normalize({...d, starts, entries, periodLen: typeof rm.periodLen==='number'?rm.periodLen:d.periodLen, cycleSeed: typeof rm.cycleSeed==='number'?rm.cycleSeed:d.cycleSeed, updatedAt: rm.updatedAt});
+    const merged=normalize({...d, starts, entries,
+      periodLen: typeof rm.periodLen==='number'?rm.periodLen:d.periodLen,
+      cycleSeed: typeof rm.cycleSeed==='number'?rm.cycleSeed:d.cycleSeed,
+      wedding: (typeof rm.wedding==='string')?rm.wedding:d.wedding,
+      updatedAt: rm.updatedAt});
     saveLocal(merged); render(true);
     const u=rm.updatedAt?new Date(rm.updatedAt):null;
     setSync('ok',u?`Synced · ${fmt(u)}`:'Synced');
-  }catch(e){ setSync('err','Offline — showing last saved'); }
+  }catch(e){ setSync('err','Offline — showing last saved'); render(true); }
 }
 async function syncPush(d){
+  if((!d.starts||!d.starts.length) && (!d.entries||!d.entries.length)){ return; } // never overwrite cloud with a blank set
   setSync('load','Saving…');
   try{
     const st=stats(d);
     const lastStart=st.dates.length?isoLocal(st.dates[st.dates.length-1]):null;
     const chicDates=[...new Set(d.entries.map(e=>e.date))].sort();
-    const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, start:lastStart, cycleLen:st.predicted, updatedAt:new Date().toISOString()};
-    const r=await fetch(`${PANTRY}/${PANTRY_ID}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, wedding:d.wedding, start:lastStart, cycleLen:st.predicted, updatedAt:new Date().toISOString()};
+    const r=await fetch(`${PANTRY}/${pantryId()}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!r.ok) throw 0;
     setSync('ok','Saved & synced');
   }catch(e){ setSync('err','Saved on phone — sync failed'); }
@@ -455,6 +519,24 @@ function render(keepSync){
   const rangeTxt = st.n ? `${fmt(pred.lo)} – ${fmt(pred.hi)} window` : 'rough window, log more to refine';
   const nextBig = pred.isLate ? `${pred.daysLate}d late` : (pred.daysToNext===0?'Today':pred.daysToNext===1?'Tomorrow':`in ${pred.daysToNext} days`);
 
+  const ann=annInfo(d);
+  let annTop='', annBanner='', annFoot='';
+  if(ann){
+    if(ann.beforeWedding){
+      annFoot=`💍 ${ann.daysToWedding} day${ann.daysToWedding===1?'':'s'} until the big day`;
+    } else {
+      annFoot=`💍 Married ${ann.wedding.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · ${ann.months} month${ann.months===1?'':'s'} together · next monthly ${fmt(ann.nextMonthly)}`;
+      if(ann.yearlyToday){
+        annTop=`<div class="ann-fest"><div class="af-e">💍🎉</div><div><div class="af-h">Happy Anniversary!</div><div class="af-s">${ann.years} year${ann.years===1?'':'s'} together today — here's to many more 🥂</div></div></div>`;
+      } else if(ann.daysToYearly<=3){
+        annBanner+=`<div class="banner love">💍 ${ann.nextYears}-year anniversary in ${ann.daysToYearly} day${ann.daysToYearly===1?'':'s'} 🎉</div>`;
+      }
+      if(ann.monthlyToday && !ann.yearlyToday){
+        annBanner=`<div class="banner love">💕 ${ann.months} month${ann.months===1?'':'s'} together today</div>`+annBanner;
+      }
+    }
+  }
+
   document.getElementById('app').innerHTML=`
     <div class="top">
       <div class="brand"><span class="moon"></span> Chic Chic</div>
@@ -462,12 +544,13 @@ function render(keepSync){
     </div>
     <div class="sync" id="syncLine"><span class="sdot"></span>Syncing…</div>
 
+    ${annTop}
     <div class="status" style="background:${vb.grad};color:${vb.color}">
       <div class="se">${vb.emoji}</div>
       <div><div class="sh">${vb.head}</div><div class="ss">${vb.sub}</div></div>
     </div>
 
-    ${banner}
+    ${annBanner}${banner}
 
     <div class="hero"><div class="ring">
       <svg width="230" height="230" viewBox="0 0 230 230">
@@ -532,7 +615,7 @@ function render(keepSync){
     <div class="section-t">Chic Chic calendar ✨</div>
     <div id="chiccal"></div>
 
-    <div class="foot">Predictions learn from logged dates and are estimates — real cycles vary, and big swings have many normal causes. Not medical advice or birth control.<br><br>Made with 🤍 for the two of you.</div>
+    <div class="foot">${annFoot?annFoot+'<br><br>':''}Predictions learn from logged dates and are estimates — real cycles vary, and big swings have many normal causes. Not medical advice or birth control.<br><br>Made with 🤍 for the two of you.</div>
   `;
   renderCalendar(d,st,pred);
   renderChicCalendar(d);
@@ -647,6 +730,8 @@ function openSheet(){
   editAj=0; editNi=0;
   document.getElementById('periodLen').value = d?d.periodLen:5;
   document.getElementById('cycleSeed').value = d?d.cycleSeed:28;
+  document.getElementById('weddingInput').value = (d&&d.wedding)?d.wedding:DEFAULT_WEDDING;
+  document.getElementById('codeField').value = pantryId();
   document.getElementById('startInput').value = isoLocal(new Date());
   document.getElementById('chicInput').value = isoLocal(new Date());
   renderStartChips(); renderChicChips(); renderStars('Aj'); renderStars('Ni');
@@ -679,10 +764,15 @@ async function save(){
   if(editStarts.length===0){ alert('Add at least one period start date 🙂'); return; }
   const periodLen=Math.max(2,Math.min(10,parseInt(document.getElementById('periodLen').value)||5));
   const cycleSeed=Math.max(20,Math.min(45,parseInt(document.getElementById('cycleSeed').value)||28));
-  const d=normalize({starts:editStarts, entries:editEntries, periodLen, cycleSeed});
+  const wedding=(document.getElementById('weddingInput').value||DEFAULT_WEDDING);
+  const newCode=(document.getElementById('codeField').value||'').trim();
+  const codeChanged = newCode && newCode!==pantryId();
+  if(newCode) setCode(newCode);
+  const d=normalize({starts:editStarts, entries:editEntries, periodLen, cycleSeed, wedding});
   saveLocal(d);
   document.getElementById('sheet').classList.remove('show');
   calMonth=null; chicCalMonth=null; render(true);
+  if(codeChanged){ await syncPull(false); }   // pull from the newly entered basket first
   await syncPush(d);
 }
 
@@ -702,12 +792,38 @@ function importJSON(ev){
 }
 
 document.getElementById('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') closeSheet(); });
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden) syncPull(false); });
-function startPoll(){ if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden) syncPull(true); },60000); }
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && getCode()) syncPull(false); });
+function startPoll(){ if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden && getCode()) syncPull(true); },60000); }
 
-render();
-syncPull(false);
-startPoll();
+function connectScreen(){
+  document.getElementById('app').innerHTML=`
+    <div class="top"><div class="brand"><span class="moon"></span> Chic Chic</div></div>
+    <div class="connect">
+      <div class="ce">🔗</div>
+      <h2>Connect your Chic Chic</h2>
+      <p>Enter your shared code to load your saved history on this device. Use the same code on both phones and they'll stay in sync.</p>
+      <input id="codeInput" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="shared code">
+      <button class="btn" style="max-width:300px" onclick="codeContinue()">Continue</button>
+      <div class="cnote">This code is the key to your data — anyone with it can see your entries, so keep it private. It's pre‑filled for you; just tap Continue.</div>
+    </div>`;
+  const i=document.getElementById('codeInput'); if(i) i.value=DEFAULT_ID;
+}
+async function codeContinue(){
+  const v=(document.getElementById('codeInput').value||'').trim();
+  if(!v){ alert('Enter your shared code 🙂'); return; }
+  setCode(v);
+  document.getElementById('app').innerHTML=`<div class="connect"><div class="ce">⏳</div><h2>Loading your data…</h2></div>`;
+  await syncPull(false);   // pull cloud FIRST, then show history
+  startPoll();
+}
+
+function boot(){
+  if(!getCode()){ connectScreen(); return; }           // first run on this device → ask for code
+  if(loadLocal()) render(); else document.getElementById('app').innerHTML=`<div class="connect"><div class="ce">⏳</div><h2>Loading your data…</h2></div>`;
+  syncPull(false);                                      // always pull-merge cloud on load
+  startPoll();
+}
+boot();
 </script>
 </body>
 </html>

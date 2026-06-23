@@ -474,27 +474,36 @@ function setSync(state,text){
   const cls=state==='ok'?'ok':state==='err'?'err':state==='load'?'load':'';
   el.innerHTML=`<span class="sdot ${cls}"></span>${text}`;
 }
+function tstamp(x){ const t=x&&x.updatedAt?Date.parse(x.updatedAt):NaN; return isNaN(t)?0:t; }
 async function syncPull(silent){
-  let d=normalize(loadLocal() || {starts:[],entries:[]});
+  let local=normalize(loadLocal() || {starts:[],entries:[]});
   if(!silent) setSync('load','Syncing…');
   try{
     if(API_BASE.indexOf('__WORKER_URL__')!==-1) throw 0;   // not configured yet
     const r=await timedFetch(`${basketURL()}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw 0;
     const rm=await r.json();
-    const starts=[...new Set([...(d.starts||[]),...(rm.starts||(rm.start?[rm.start]:[]))])].sort();
-    const remoteEntries = Array.isArray(rm.entries)?rm.entries:(Array.isArray(rm.log)?rm.log:[]);
-    const map={};
-    [...(d.entries||[]),...remoteEntries].forEach(e=>{ const o=(typeof e==='string')?{id:e+'-0',date:e,aj:0,ni:0}:e; if(o&&o.date) map[o.id||uid(o.date)]=o; });
-    const entries=Object.values(map);
-    const merged=normalize({...d, starts, entries,
-      periodLen: typeof rm.periodLen==='number'?rm.periodLen:d.periodLen,
-      cycleSeed: typeof rm.cycleSeed==='number'?rm.cycleSeed:d.cycleSeed,
-      wedding: (typeof rm.wedding==='string')?rm.wedding:d.wedding,
-      updatedAt: rm.updatedAt});
-    saveLocal(merged); render(true);
-    const u=rm.updatedAt?new Date(rm.updatedAt):null;
-    setSync('ok',u?`Synced · ${fmt(u)}`:'Synced');
+    const remoteHasData = (Array.isArray(rm.starts)&&rm.starts.length) || rm.start ||
+                          (Array.isArray(rm.entries)&&rm.entries.length) || (Array.isArray(rm.log)&&rm.log.length);
+    // NEWEST DOCUMENT WINS — no union. Whichever side was saved most recently is the truth.
+    const remoteNewer = tstamp(rm) >= tstamp(local);
+    if(remoteHasData && remoteNewer){
+      // adopt the cloud copy wholesale — this is what lets edits & deletes from the other phone land here
+      const adopted=normalize({
+        starts: Array.isArray(rm.starts)?rm.starts:(rm.start?[rm.start]:[]),
+        entries: Array.isArray(rm.entries)?rm.entries:(Array.isArray(rm.log)?rm.log:[]),
+        periodLen: rm.periodLen, cycleSeed: rm.cycleSeed, wedding: rm.wedding,
+        updatedAt: rm.updatedAt
+      });
+      saveLocal(adopted); render(true);
+      const u=rm.updatedAt?new Date(rm.updatedAt):null;
+      setSync('ok',u?`Synced · ${fmt(u)}`:'Synced');
+    } else {
+      // local is newer (or cloud empty): keep local, and push it up so the cloud catches up
+      render(true);
+      setSync('ok','Synced');
+      if((local.starts&&local.starts.length)||(local.entries&&local.entries.length)) syncPush(local,true);
+    }
   }catch(e){
     setSync('err','Offline — showing last saved');
     // never get stuck: if there is local data, show it; otherwise drop to setup
@@ -502,7 +511,7 @@ async function syncPull(silent){
     else if(document.getElementById('app')) document.getElementById('app').innerHTML=welcome();
   }
 }
-async function syncPush(d){
+async function syncPush(d,keepStamp){
   if((!d.starts||!d.starts.length) && (!d.entries||!d.entries.length)){ return; } // never overwrite cloud with a blank set
   if(API_BASE.indexOf('__WORKER_URL__')!==-1){ setSync('err','Saved on phone — backend not set'); return; }
   setSync('load','Saving…');
@@ -510,7 +519,11 @@ async function syncPush(d){
     const st=stats(d);
     const lastStart=st.dates.length?isoLocal(st.dates[st.dates.length-1]):null;
     const chicDates=[...new Set(d.entries.map(e=>e.date))].sort();
-    const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, wedding:d.wedding, start:lastStart, cycleLen:st.predicted, updatedAt:new Date().toISOString()};
+    // reuse existing timestamp on catch-up pushes; otherwise mint a fresh one for this edit
+    const stamp = (keepStamp && d.updatedAt) ? d.updatedAt : new Date().toISOString();
+    const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, wedding:d.wedding, start:lastStart, cycleLen:st.predicted, updatedAt:stamp};
+    // keep local stamped identically so newest-wins comparisons are accurate
+    saveLocal({...d, updatedAt:stamp});
     const r=await timedFetch(basketURL(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!r.ok) throw 0;
     setSync('ok','Saved & synced');

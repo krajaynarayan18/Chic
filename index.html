@@ -256,15 +256,32 @@
 <script>
 const LKEY='chicChic.v2';
 const CODEKEY='chicChic.code';
-const PANTRY='https://getpantry.cloud/apiv1/pantry';
-const DEFAULT_ID='02f8fe61-5672-486d-8271-373da9e3600d';   // pre-filled on the connect screen
-const BASKET='cycle';
+
+/* ============================================================
+   STORAGE BACKEND — Cloudflare Worker (replaces Pantry)
+   Set API_BASE to your deployed Worker URL, e.g.
+     https://chic-chic.<your-subdomain>.workers.dev
+   No trailing slash. The app calls  API_BASE + '/basket/<code>'.
+   ============================================================ */
+const API_BASE='https://chic-chic.ajayfabregas.workers.dev';
+const FETCH_TIMEOUT=8000;   // ms — never let a dead backend hang the UI
+
+const DEFAULT_ID='chicchic-aj-ni';   // default shared code, pre-filled on connect
 const DAY=86400000;
 const DEFAULT_WEDDING='2026-04-20';
 let pollTimer=null, editStarts=[], editEntries=[], editAj=0, editNi=0, calMonth=null, chicCalMonth=null;
 function getCode(){ return (localStorage.getItem(CODEKEY)||'').trim(); }
 function setCode(c){ localStorage.setItem(CODEKEY,(c||'').trim()); }
-function pantryId(){ return getCode() || DEFAULT_ID; }
+function syncCode(){ return getCode() || DEFAULT_ID; }
+function basketURL(){ return `${API_BASE}/basket/${encodeURIComponent(syncCode())}`; }
+
+/* fetch with a hard timeout so the app can never get stuck "Loading…" */
+async function timedFetch(url,opts){
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),FETCH_TIMEOUT);
+  try{ return await fetch(url,{...opts,signal:ctrl.signal}); }
+  finally{ clearTimeout(t); }
+}
 
 const PHASES=[
   {emoji:'🩸', label:'Code Red',    color:'#e8607a',
@@ -451,7 +468,7 @@ function annInfo(d){
     nextMonthly:nm,nmMonths,daysToMonthly,nextYearly:ny,nextYears,daysToYearly};
 }
 
-/* ---------- sync (Pantry ID baked in) ---------- */
+/* ---------- sync (Cloudflare Worker) ---------- */
 function setSync(state,text){
   const el=document.getElementById('syncLine'); if(!el) return;
   const cls=state==='ok'?'ok':state==='err'?'err':state==='load'?'load':'';
@@ -461,7 +478,8 @@ async function syncPull(silent){
   let d=normalize(loadLocal() || {starts:[],entries:[]});
   if(!silent) setSync('load','Syncing…');
   try{
-    const r=await fetch(`${PANTRY}/${pantryId()}/basket/${BASKET}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
+    if(API_BASE.indexOf('__WORKER_URL__')!==-1) throw 0;   // not configured yet
+    const r=await timedFetch(`${basketURL()}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw 0;
     const rm=await r.json();
     const starts=[...new Set([...(d.starts||[]),...(rm.starts||(rm.start?[rm.start]:[]))])].sort();
@@ -477,17 +495,23 @@ async function syncPull(silent){
     saveLocal(merged); render(true);
     const u=rm.updatedAt?new Date(rm.updatedAt):null;
     setSync('ok',u?`Synced · ${fmt(u)}`:'Synced');
-  }catch(e){ setSync('err','Offline — showing last saved'); render(true); }
+  }catch(e){
+    setSync('err','Offline — showing last saved');
+    // never get stuck: if there is local data, show it; otherwise drop to setup
+    if(loadLocal()) render(true);
+    else if(document.getElementById('app')) document.getElementById('app').innerHTML=welcome();
+  }
 }
 async function syncPush(d){
   if((!d.starts||!d.starts.length) && (!d.entries||!d.entries.length)){ return; } // never overwrite cloud with a blank set
+  if(API_BASE.indexOf('__WORKER_URL__')!==-1){ setSync('err','Saved on phone — backend not set'); return; }
   setSync('load','Saving…');
   try{
     const st=stats(d);
     const lastStart=st.dates.length?isoLocal(st.dates[st.dates.length-1]):null;
     const chicDates=[...new Set(d.entries.map(e=>e.date))].sort();
     const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, wedding:d.wedding, start:lastStart, cycleLen:st.predicted, updatedAt:new Date().toISOString()};
-    const r=await fetch(`${PANTRY}/${pantryId()}/basket/${BASKET}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const r=await timedFetch(basketURL(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!r.ok) throw 0;
     setSync('ok','Saved & synced');
   }catch(e){ setSync('err','Saved on phone — sync failed'); }
@@ -731,7 +755,7 @@ function openSheet(){
   document.getElementById('periodLen').value = d?d.periodLen:5;
   document.getElementById('cycleSeed').value = d?d.cycleSeed:28;
   document.getElementById('weddingInput').value = (d&&d.wedding)?d.wedding:DEFAULT_WEDDING;
-  document.getElementById('codeField').value = pantryId();
+  document.getElementById('codeField').value = syncCode();
   document.getElementById('startInput').value = isoLocal(new Date());
   document.getElementById('chicInput').value = isoLocal(new Date());
   renderStartChips(); renderChicChips(); renderStars('Aj'); renderStars('Ni');
@@ -766,13 +790,13 @@ async function save(){
   const cycleSeed=Math.max(20,Math.min(45,parseInt(document.getElementById('cycleSeed').value)||28));
   const wedding=(document.getElementById('weddingInput').value||DEFAULT_WEDDING);
   const newCode=(document.getElementById('codeField').value||'').trim();
-  const codeChanged = newCode && newCode!==pantryId();
+  const codeChanged = newCode && newCode!==syncCode();
   if(newCode) setCode(newCode);
   const d=normalize({starts:editStarts, entries:editEntries, periodLen, cycleSeed, wedding});
   saveLocal(d);
   document.getElementById('sheet').classList.remove('show');
   calMonth=null; chicCalMonth=null; render(true);
-  if(codeChanged){ await syncPull(false); }   // pull from the newly entered basket first
+  if(codeChanged){ await syncPull(false); }   // pull from the newly entered code first
   await syncPush(d);
 }
 

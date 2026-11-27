@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Chic Chic">
+<meta name="theme-color" content="#171019">
+<title>Chic Chic</title>
+<style>
+  :root{
+    --bg:#171019; --bg2:#1f1622; --card:#241a2a; --line:rgba(255,255,255,0.08);
+    --txt:#f3ecf4; --mut:#a99bb0; --faint:#766b7d;
+    --red:#e8607a; --amber:#e8a24a; --teal:#4fc7a8; --pink:#d98bb0; --green:#7bd88f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;min-height:100dvh;padding:env(safe-area-inset-top) 18px calc(env(safe-area-inset-bottom) + 28px);max-width:480px;margin:0 auto;overflow-x:hidden}
+  .wrap{padding-top:22px}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:600;letter-spacing:.2px}
+  .brand .moon{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 32% 32%,#fbe9c9,#e8a24a 60%,#b9742f);box-shadow:0 0 14px rgba(232,162,74,.4)}
+  .gear{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--mut);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer}
+  .gear:active{transform:scale(.93)}
+
+  .sync{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--faint);margin:0 2px 16px;height:14px}
+  .sdot{width:7px;height:7px;border-radius:50%;background:var(--faint);flex:none}
+  .sdot.ok{background:var(--green)} .sdot.err{background:var(--red)} .sdot.load{background:var(--amber);animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+
+  /* status (message-reactive) */
+  .status{border-radius:18px;padding:15px 16px;margin-bottom:14px;display:flex;align-items:center;gap:13px;border:1px solid rgba(255,255,255,.1)}
+  .status .se{font-size:30px;line-height:1;flex:none}
+  .status .sh{font-size:16px;font-weight:700;letter-spacing:.2px}
+  .status .ss{font-size:12px;opacity:.85;margin-top:3px;line-height:1.4}
+
+  .banner{border-radius:15px;padding:12px 15px;margin-bottom:14px;font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:9px;line-height:1.4}
+  .banner.warn{background:rgba(232,162,74,.15);border:1px solid rgba(232,162,74,.35);color:#f0c178}
+  .banner.late{background:rgba(232,96,122,.15);border:1px solid rgba(232,96,122,.35);color:#f09bb0}
+  .banner.love{background:rgba(217,139,176,.15);border:1px solid rgba(217,139,176,.35);color:#eab6cf}
+
+  .ann-fest{border-radius:18px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,#7a4dae,#3a2168);border:1px solid rgba(231,198,255,.35);box-shadow:0 6px 26px rgba(122,77,174,.3)}
+  .ann-fest .af-e{font-size:30px;line-height:1;flex:none}
+  .ann-fest .af-h{font-size:17px;font-weight:800;color:#fff;letter-spacing:.2px}
+  .ann-fest .af-s{font-size:12.5px;color:#e7caff;margin-top:3px;line-height:1.4}
+
+  .connect{display:flex;flex-direction:column;align-items:center;text-align:center;padding:54px 6px 0}
+  .connect .ce{font-size:52px;margin-bottom:14px}
+  .connect h2{font-size:21px;font-weight:700;margin-bottom:8px}
+  .connect p{font-size:13.5px;color:var(--mut);line-height:1.6;margin-bottom:22px;max-width:330px}
+  .connect input{margin-bottom:14px;text-align:center;font-size:14px}
+  .connect .cnote{font-size:11.5px;color:var(--faint);margin-top:14px;line-height:1.5;max-width:330px}
+
+  .hero{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:2px 0 22px}
+  .ring{position:relative;width:230px;height:230px}
+  .ring svg{transform:rotate(-90deg)}
+  .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24px}
+  .emoji{font-size:40px;line-height:1;margin-bottom:7px}
+  .phase{font-size:24px;font-weight:700;letter-spacing:.2px}
+  .dayline{font-size:13px;color:var(--mut);margin-top:8px}
+
+  .quip{text-align:center;font-size:14px;line-height:1.55;color:var(--txt);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 18px;margin-bottom:14px}
+  .quip b{font-weight:600}
+
+  .pred{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+  .pred .row1{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .pred .lab{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px}
+  .pred .big{font-size:22px;font-weight:700;margin-top:5px}
+  .pred .range{font-size:12.5px;color:var(--mut);margin-top:3px}
+  .conf{font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:999px;white-space:nowrap;flex:none}
+  .conf.green{background:rgba(123,216,143,.16);color:var(--green)}
+  .conf.teal{background:rgba(79,199,168,.16);color:var(--teal)}
+  .conf.amber{background:rgba(232,162,74,.16);color:var(--amber)}
+  .conf.none{background:rgba(255,255,255,.06);color:var(--mut)}
+
+  .chic{background:linear-gradient(135deg,rgba(232,96,122,.16),rgba(217,139,176,.10));border:1px solid rgba(232,96,122,.3);border-radius:18px;padding:15px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .chic-k{font-size:11px;color:var(--pink);text-transform:uppercase;letter-spacing:1.2px;font-weight:600;margin-bottom:5px}
+  .chic-v{font-size:19px;font-weight:700;letter-spacing:.2px}
+  .chic-sub{font-size:12px;color:var(--mut);margin-top:3px}
+  .chic-btn{flex:none;background:linear-gradient(135deg,#e8607a,#d98bb0);color:#2a0d1a;border:none;border-radius:13px;padding:12px 16px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap}
+  .chic-btn:active{transform:scale(.95)}
+
+  .ccstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+  .ccs{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 8px;text-align:center}
+  .ccs-v{font-size:18px;font-weight:700;letter-spacing:.2px}
+  .ccs-k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.6px;margin-top:3px}
+  .ccnote{font-size:11px;color:var(--faint);text-align:center;margin-bottom:14px;line-height:1.5}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+  .stat .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:6px;margin-bottom:7px}
+  .stat .v{font-size:17px;font-weight:600;letter-spacing:.2px}
+  .stat .v small{font-size:12px;font-weight:400;color:var(--mut)}
+  .stat .sub{font-size:11.5px;color:var(--mut);margin-top:3px}
+
+  .section-t{font-size:12px;color:var(--faint);text-transform:uppercase;letter-spacing:1.3px;margin:18px 2px 11px}
+
+  .timeline{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 16px 14px;margin-bottom:6px}
+  .bar{display:flex;height:13px;border-radius:7px;overflow:hidden;margin-bottom:12px}
+  .seg{height:100%}
+  .marker{position:relative;height:0}
+  .dot{position:absolute;top:-19px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--bg);box-shadow:0 0 0 2px #fff;transform:translateX(-50%)}
+  .legend{display:flex;flex-wrap:wrap;gap:9px 14px;margin-top:4px}
+  .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut)}
+  .sw{width:9px;height:9px;border-radius:3px}
+
+  .phaselist{display:flex;flex-direction:column;gap:9px}
+  .pcard{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px}
+  .pcard.active{border-color:rgba(255,255,255,.28)}
+  .pemoji{font-size:23px;width:30px;text-align:center}
+  .pmeta{flex:1;min-width:0}
+  .pname{font-size:14.5px;font-weight:600}
+  .pdesc{font-size:12px;color:var(--mut);margin-top:2px;line-height:1.45}
+  .prange{font-size:11px;color:var(--faint);white-space:nowrap}
+
+  .avg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hist{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin-top:12px}
+  .hrow{display:flex;align-items:center;gap:10px;margin:9px 0}
+  .hrow .hd{font-size:12px;color:var(--mut);width:118px;flex:none}
+  .htrack{flex:1;height:9px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden}
+  .hfill{height:100%;background:linear-gradient(90deg,#e8607a,#d98bb0);border-radius:6px}
+  .hlen{font-size:12px;font-weight:600;width:42px;text-align:right;flex:none}
+  .empty{font-size:12.5px;color:var(--faint);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;line-height:1.5}
+
+  .cal{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:6px}
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .cal-nav button{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer}
+  .cal-nav button:active{transform:scale(.93)}
+  .cal-title{font-size:14px;font-weight:600}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .cal-dow{font-size:9.5px;color:var(--faint);text-align:center;text-transform:uppercase;letter-spacing:.5px;padding-bottom:2px}
+  .cal-cell{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:var(--txt);position:relative;border:1px solid transparent}
+  .cal-cell.muted{color:var(--faint);opacity:.45}
+  .cal-cell.today{border-color:#fff}
+  .cal-cell.start{box-shadow:inset 0 0 0 2px rgba(255,255,255,.6)}
+  .cal-cc{position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:#fff}
+  .cal-pred-note{font-size:10.5px;color:var(--faint);margin-top:10px;text-align:center}
+  /* chic calendar */
+  .ccell{aspect-ratio:1;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--txt);position:relative;border:1px solid transparent;cursor:pointer}
+  .ccell.today{border-color:#fff}
+  .ccell .badge{position:absolute;top:2px;right:3px;font-size:9px;font-weight:700;background:var(--red);color:#2a0d1a;border-radius:7px;padding:0 4px;line-height:14px;min-width:14px;text-align:center}
+
+  .foot{text-align:center;font-size:11px;color:var(--faint);margin-top:20px;line-height:1.6}
+
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:50}
+  .sheet.show{display:flex}
+  .panel{width:100%;max-width:480px;background:var(--bg2);border-top-left-radius:26px;border-top-right-radius:26px;border-top:1px solid var(--line);padding:22px 20px calc(env(safe-area-inset-bottom) + 26px);max-height:92vh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.8,.25,1)}
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .panel h2{font-size:19px;font-weight:700;margin-bottom:4px}
+  .panel .lead{font-size:13px;color:var(--mut);margin-bottom:18px;line-height:1.5}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12.5px;color:var(--mut);margin-bottom:7px;font-weight:500}
+  .field .hint{font-size:11.5px;color:var(--faint);margin-top:6px;line-height:1.4}
+  input{width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px;color:var(--txt);font-size:16px;font-family:inherit}
+  input:focus{outline:none;border-color:var(--pink)}
+  .row{display:flex;gap:12px}
+  .row .field{flex:1}
+  .btn{width:100%;background:linear-gradient(135deg,#e8607a,#d98bb0);color:#2a0d1a;border:none;border-radius:14px;padding:15px;font-size:15.5px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px}
+  .btn:active{transform:scale(.98)}
+  .btn.ghost{background:transparent;color:var(--mut);border:1px solid var(--line);margin-top:10px;font-weight:500}
+  .addrow{display:flex;gap:8px;align-items:stretch}
+  .addrow input{flex:1;min-width:0}
+  .mini-btn{flex:none;background:var(--pink);color:#2a0d1a;border:none;border-radius:12px;padding:0 18px;font-size:13.5px;font-weight:700;font-family:inherit;cursor:pointer}
+  .mini-btn:active{transform:scale(.96)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+  .chip-x{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 8px 6px 12px;font-size:12px;color:var(--txt)}
+  .chip-x button{background:none;border:none;color:var(--mut);font-size:15px;line-height:1;cursor:pointer;padding:0 2px;width:auto}
+  .chip-x button:active{color:var(--red)}
+  .divider{height:1px;background:var(--line);margin:6px 0 18px}
+  .starsrow{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .starsrow .who{font-size:13px;font-weight:600;width:34px;flex:none}
+  .stars{display:flex;gap:4px}
+  .star{font-size:22px;cursor:pointer;line-height:1;filter:grayscale(1);opacity:.4}
+  .star.on{filter:none;opacity:1}
+  .two{display:flex;gap:10px}
+  .two .btn,.two .mini-btn{flex:1}
+  .exp{display:flex;gap:10px;margin-top:4px}
+  .exp button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:11px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer}
+  .exp button:active{transform:scale(.97)}
+
+  /* modes: question card, week peek, appointments */
+  .ask{background:var(--card);border:1px solid rgba(231,202,255,.3);border-radius:18px;padding:15px 16px;margin-bottom:14px}
+  .ask-h{font-size:16px;font-weight:700;letter-spacing:.2px}
+  .ask-s{font-size:12.5px;color:var(--mut);margin-top:5px;line-height:1.5}
+  .ask-b{display:flex;flex-direction:column;gap:8px;margin-top:13px}
+  .ask-b button{background:var(--bg2);border:1px solid var(--line);color:var(--txt);border-radius:13px;padding:13px 14px;font-size:14px;font-weight:600;font-family:inherit;text-align:left;cursor:pointer}
+  .ask-b button:active{transform:scale(.98)}
+  .weeknav{display:flex;gap:8px;margin:-4px 0 14px}
+  .weeknav button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:10px 4px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer}
+  .weeknav button:disabled{opacity:.3}
+  .weeknav button:active{transform:scale(.97)}
+  .arow{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px 11px 14px;margin-bottom:8px}
+  .arow .at{font-size:14px;font-weight:600}
+  .arow .ad{font-size:11.5px;color:var(--mut);margin-top:2px}
+  .arow button{background:none;border:none;color:var(--mut);font-size:19px;line-height:1;cursor:pointer;padding:4px 6px}
+  .modebtn{width:100%;background:var(--card);border:1px solid rgba(231,202,255,.3);color:var(--txt);border-radius:13px;padding:13px 14px;font-size:13.5px;font-weight:600;font-family:inherit;text-align:left;cursor:pointer;margin-bottom:16px}
+  .modebtn:active{transform:scale(.98)}
+  .wk{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px 14px;margin-bottom:14px}
+  .wk-t{font-size:15px;font-weight:700;letter-spacing:.2px}
+  .wk-k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:1px;margin:14px 0 6px}
+  .wk-p{font-size:13.5px;line-height:1.55}
+  .wk ul{list-style:none}
+  .wk li{font-size:13.5px;line-height:1.5;padding-left:16px;position:relative;margin-bottom:6px}
+  .wk li::before{content:'';position:absolute;left:2px;top:8px;width:5px;height:5px;border-radius:50%;background:var(--acc,var(--teal))}
+  .wk-w{font-size:11.5px;color:var(--mut);line-height:1.5;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .nrow{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 14px 10px;margin-bottom:9px}
+  .nrow.fav{border-color:rgba(232,162,74,.55)}
+  .nhead{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .nname{flex:1;min-width:0;font-size:16px;font-weight:700;letter-spacing:.2px;overflow-wrap:anywhere}
+  .ntot{font-size:12px;font-weight:700;color:var(--amber);flex:none}
+  .nhead button{background:none;border:none;color:var(--mut);font-size:19px;line-height:1;cursor:pointer;padding:2px 4px;flex:none}
+  .nrate{display:flex;align-items:center;gap:10px;margin-top:5px}
+  .nrate .who{font-size:12.5px;font-weight:600;width:26px;flex:none;color:var(--mut)}
+  .nrate .star{font-size:19px}
+  #msheet{z-index:60}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<div class="sheet" id="sheet">
+  <div class="panel">
+    <h2 id="sheetTitle">Cycle settings</h2>
+    <p class="lead">Log period start dates and Chic Chic entries. Everything auto‑syncs to both phones.</p>
+    <div id="modeRow"></div>
+
+    <div class="field">
+      <label>Period start dates 🩸</label>
+      <div class="addrow">
+        <input type="date" id="startInput">
+        <button type="button" class="mini-btn" onclick="addStart()">Add</button>
+      </div>
+      <div class="hint">First day of each period. The most recent is the current cycle start. Tap × to remove.</div>
+      <div id="startChips" class="chips"></div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Period length</label>
+        <input type="number" id="periodLen" min="2" max="10" value="5">
+        <div class="hint">Bleeding days. Avg 5.</div>
+      </div>
+      <div class="field">
+        <label>Starting estimate</label>
+        <input type="number" id="cycleSeed" min="20" max="45" value="28">
+        <div class="hint">Used until 2+ periods logged.</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Log a Chic Chic ✨</label>
+      <div class="addrow" style="margin-bottom:12px"><input type="date" id="chicInput"></div>
+      <div class="starsrow"><span class="who">Aj</span><div class="stars" id="starsAj"></div></div>
+      <div class="starsrow"><span class="who">Ni</span><div class="stars" id="starsNi"></div></div>
+      <button type="button" class="mini-btn" style="width:100%;padding:11px 0" onclick="addChic()">＋ Add this entry</button>
+      <div class="hint">Add as many as you like — even several for one day. Each gets both your star ratings.</div>
+      <div id="chicChips" class="chips"></div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Anniversary 💍</label>
+      <input type="date" id="weddingInput">
+      <div class="hint">Your wedding date. Monthly anniversaries get a small note; the yearly one gets a celebration — on the app and the widget.</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Shared sync code</label>
+      <input type="text" id="codeField" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <div class="hint">Both phones must use the same code to share data. Keep it private — anyone with it can see your entries. Only change this if you know what you're doing.</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="field">
+      <label>Backup &amp; restore</label>
+      <div class="exp">
+        <button type="button" onclick="exportJSON()">⬇︎ Backup (JSON)</button>
+        <button type="button" onclick="exportCSV()">⬇︎ CSV</button>
+        <button type="button" onclick="document.getElementById('importFile').click()">⬆︎ Restore</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importJSON(event)">
+      <div class="hint">Backup downloads everything as a file you keep. Restore loads a backup back in.</div>
+    </div>
+
+    <button class="btn" onclick="save()">Save &amp; sync</button>
+    <button class="btn ghost" onclick="closeSheet()">Cancel</button>
+  </div>
+</div>
+
+<div class="sheet" id="msheet"><div class="panel" id="mpanel"></div></div>
+
+<script>
+const LKEY='chicChic.v2';
+const CODEKEY='chicChic.code';
+
+/* ============================================================
+   STORAGE BACKEND — Cloudflare Worker (replaces Pantry)
+   Set API_BASE to your deployed Worker URL, e.g.
+     https://chic-chic.<your-subdomain>.workers.dev
+   No trailing slash. The app calls  API_BASE + '/basket/<code>'.
+   ============================================================ */
+const API_BASE='https://chic-chic.ajayfabregas.workers.dev';
+const FETCH_TIMEOUT=8000;   // ms — never let a dead backend hang the UI
+
+const DEFAULT_ID='chicchic-aj-ni';   // default shared code, pre-filled on connect
+const DAY=86400000;
+const DEFAULT_WEDDING='2026-04-20';
+let pollTimer=null, editStarts=[], editEntries=[], editAj=0, editNi=0, calMonth=null, chicCalMonth=null;
+function getCode(){ return (localStorage.getItem(CODEKEY)||'').trim(); }
+function setCode(c){ localStorage.setItem(CODEKEY,(c||'').trim()); }
+function syncCode(){ return getCode() || DEFAULT_ID; }
+function basketURL(){ return `${API_BASE}/basket/${encodeURIComponent(syncCode())}`; }
+
+/* fetch with a hard timeout so the app can never get stuck "Loading…" */
+async function timedFetch(url,opts){
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),FETCH_TIMEOUT);
+  try{ return await fetch(url,{...opts,signal:ctrl.signal}); }
+  finally{ clearTimeout(t); }
+}
+
+const PHASES=[
+  {emoji:'🩸', label:'Code Red',    color:'#e8607a',
+   quip:"It's <b>Code Red</b>. Energy's low, cramps are real. Show up with snacks, a hot water bag, and zero opinions on dinner.",
+   short:'Snacks, heat pad, no debates'},
+  {emoji:'🌱', label:'Glow Up',     color:'#4fc7a8',
+   quip:"She's <b>back online</b> — energy rising, mood lifting, up for anything. Best week to say yes to a trip or try something new.",
+   short:'High energy, say yes to plans'},
+  {emoji:'💘', label:'Date Night',  color:'#e8a24a',
+   quip:"Peak <b>charm offensive</b>. Feeling herself, vibes are great. Book the nice dinner — this is the window.",
+   short:'Peak mood, book something nice'},
+  {emoji:'🌧️', label:'Storm Watch', color:'#d98bb0',
+   quip:"<b>Handle with care.</b> Mood swings, cravings, short fuse. Keep chocolate stocked, agree often, pick your battles wisely.",
+   short:'Chocolate, patience, agree often'},
+];
+const PCOL=PHASES.map(p=>p.color);
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function uid(date){ return date+'-'+Math.random().toString(36).slice(2,8); }
+function loadLocal(){ try{return normalize(JSON.parse(localStorage.getItem(LKEY)))}catch(e){return null} }
+function saveLocal(d){ localStorage.setItem(LKEY,JSON.stringify(d)) }
+function normalize(d){
+  if(!d) return null;
+  if(!Array.isArray(d.starts)) d.starts = d.start ? [d.start] : [];
+  d.starts = [...new Set(d.starts)].sort();
+  let entries = Array.isArray(d.entries) ? d.entries : (Array.isArray(d.log) ? d.log : []);
+  entries = entries.map(e=> typeof e==='string'
+      ? {id:e+'-0', date:e, aj:0, ni:0}
+      : {id:e.id||uid(e.date), date:e.date, aj:+e.aj||0, ni:+e.ni||0}
+    ).filter(e=>e.date);
+  entries.sort((a,b)=> a.date<b.date?-1 : a.date>b.date?1 : (a.id<b.id?-1:1));
+  d.entries=entries; delete d.log;
+  if(typeof d.periodLen!=='number') d.periodLen=5;
+  if(typeof d.cycleSeed!=='number') d.cycleSeed=(typeof d.cycleLen==='number'?d.cycleLen:28);
+  if(typeof d.wedding!=='string' || !/^\d{4}-\d{2}-\d{2}$/.test(d.wedding)) d.wedding=DEFAULT_WEDDING;
+  // mode data (new keys — old data above is untouched)
+  if(!d.preg || typeof d.preg!=='object' || !isDate(d.preg.lmp)) d.preg=null; else if(!Array.isArray(d.preg.appts)) d.preg.appts=[];
+  if(!d.post || typeof d.post!=='object' || !isDate(d.post.since)) d.post=null;
+  if(!Array.isArray(d.pregHistory)) d.pregHistory=[];
+  if(!isDate(d.snoozeUntil)) d.snoozeUntil=null;
+  d.names=(Array.isArray(d.names)?d.names:[]).filter(n=>n&&n.name).map(n=>({id:n.id||uid('n'), name:String(n.name).slice(0,30), aj:+n.aj||0, ni:+n.ni||0}));
+  return d;
+}
+
+function fmt(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}
+function fmtFull(d){return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}
+function midnight(d){const x=new Date(d);x.setHours(0,0,0,0);return x}
+function isoLocal(d){const x=new Date(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
+function addDays(d,n){return new Date(d.getTime()+n*DAY);}
+function parseD(s){return midnight(new Date(s+'T00:00:00'));}
+function monthName(k){ if(!k) return ''; const [y,m]=k.split('-'); return MONTHS[parseInt(m)-1].slice(0,3)+" '"+y.slice(2); }
+
+function phaseIdx(dayInCycle,C,P){
+  const ov=C-14;
+  if(dayInCycle<=P) return 0;
+  if(dayInCycle<ov-2) return 1;
+  if(dayInCycle<=ov+1) return 2;
+  return 3;
+}
+
+function stats(d){
+  const dates=d.starts.map(parseD);
+  const cycles=[];
+  for(let i=1;i<dates.length;i++){ const len=Math.round((dates[i]-dates[i-1])/DAY); if(len<=LONG_GAP) cycles.push({a:dates[i-1],b:dates[i],len}); }
+  const lengths=cycles.map(c=>c.len);
+  const recent=lengths.slice(-6); const n=recent.length;
+  let avg=null,min=null,max=null,predicted=d.cycleSeed;
+  if(n>=1){ avg=Math.round(recent.reduce((a,b)=>a+b,0)/n); min=Math.min(...recent); max=Math.max(...recent); predicted=avg; }
+  return {dates,cycles,lengths,recent,n,avg,min,max,predicted,spread:(n?max-min:0)};
+}
+
+function confidence(st){
+  if(st.dates.length===0) return {label:'Add a date to start',cls:'none'};
+  if(st.n===0) return {label:'Rough · seed estimate',cls:'amber'};
+  if(st.n>=2 && st.spread>7) return {label:`Irregular · ${st.min}–${st.max}d`,cls:'amber'};
+  if(st.n>=4) return {label:'High confidence',cls:'green'};
+  if(st.n>=2) return {label:`Improving · ${st.n} cycles`,cls:'teal'};
+  return {label:'Rough · 1 cycle',cls:'amber'};
+}
+
+function prediction(d,st){
+  if(st.dates.length===0) return null;
+  const today=midnight(new Date());
+  const lastStart=st.dates[st.dates.length-1];
+  const L=st.predicted, P=d.periodLen;
+  const nextStart=addDays(lastStart,L);
+  const daysToNext=Math.round((nextStart-today)/DAY);
+  const isLate=daysToNext<0, daysLate=-daysToNext;
+  const lo=st.n?addDays(lastStart,st.min):addDays(nextStart,-2);
+  const hi=st.n?addDays(lastStart,st.max):addDays(nextStart,2);
+  const daysSince=Math.floor((today-lastStart)/DAY);
+  const dayInCycle=daysSince+1;
+  let pIdx=phaseIdx(dayInCycle,L,P);
+  if(dayInCycle>L) pIdx=3;
+  const ovDay=L-14;
+  const ovDateCur=addDays(lastStart,ovDay-1);
+  let ovDate=ovDateCur; let daysToOv=Math.round((ovDate-today)/DAY);
+  if(daysToOv<0){ ovDate=addDays(nextStart,ovDay-1); daysToOv=Math.round((ovDate-today)/DAY); }
+  const fertileStart=addDays(ovDate,-5);
+  const inFertile = today>=fertileStart && today<=ovDate;
+  return {today,lastStart,L,P,nextStart,daysToNext,isLate,daysLate,lo,hi,daysSince,dayInCycle,pIdx,ovDate,ovDateCur,daysToOv,fertileStart,inFertile};
+}
+
+function chicInfo(d,cycleStart){
+  const entries=d.entries;
+  const today=midnight(new Date());
+  const todayStr=isoLocal(today);
+  const dayset=[...new Set(entries.map(e=>e.date))].sort();
+  const loggedToday=dayset.includes(todayStr);
+  let last=null,daysAgo=null;
+  if(dayset.length){ last=parseD(dayset[dayset.length-1]); daysAgo=Math.round((today-last)/DAY); }
+  const dts=dayset.map(parseD); const gaps=[];
+  for(let i=1;i<dts.length;i++) gaps.push(Math.round((dts[i]-dts[i-1])/DAY));
+  let recordGap=0,recordStart=null,recordEnd=null;
+  const ps=pauses(d).map(([f,t])=>[parseD(f), t?parseD(t):today]);
+  const paused=(a,b)=>ps.some(([f,t])=>a<t && b>f);
+  const live = modeOf(d)==='cycle' && last && !paused(last,today);
+  for(let i=0;i<gaps.length;i++){ if(gaps[i]>recordGap && !paused(dts[i],dts[i+1])){ recordGap=gaps[i]; recordStart=dts[i]; recordEnd=dts[i+1]; } }
+  const avgGap=gaps.length?Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length):null;
+  const currentGap=daysAgo;
+  const beatingRecord=!!(live&&currentGap!=null&&recordGap>0&&currentGap>recordGap);
+  const nearRecord=!!(live&&currentGap!=null&&recordGap>0&&!beatingRecord&&(recordGap-currentGap)<=2);
+  const total=entries.length;
+  const inCycle = cycleStart?entries.filter(e=>{const dt=parseD(e.date);return dt>=cycleStart && dt<=today;}):[];
+  const thisCycleEntries=inCycle.length;
+  const thisCycleDays=[...new Set(inCycle.map(e=>e.date))].length;
+  const month=todayStr.slice(0,7);
+  const thisMonth=entries.filter(e=>e.date.slice(0,7)===month).length;
+  const mc={}; entries.forEach(e=>{const k=e.date.slice(0,7); mc[k]=(mc[k]||0)+1;});
+  let bestMonth=0,bestMonthKey=null; Object.entries(mc).forEach(([k,v])=>{ if(v>bestMonth){bestMonth=v;bestMonthKey=k;} });
+  return {entries,dayset,loggedToday,last,daysAgo,gaps,recordGap,recordStart,recordEnd,avgGap,currentGap,beatingRecord,nearRecord,total,thisCycleEntries,thisCycleDays,thisMonth,bestMonth,bestMonthKey};
+}
+
+function chicTier(days){
+  if(days<=0) return {t:'Get Chic Chic ASAP',e:'🚨',cls:'asap'};
+  if(days<5)  return {t:'The fire is fading',e:'🥶',cls:'cold'};
+  if(days<=10) return {t:'Needs more Chic Chic',e:'👀',cls:'meh'};
+  if(days<=15) return {t:'Excellent bonding',e:'💕',cls:'good'};
+  return {t:'Super bond',e:'🔥',cls:'super'};
+}
+
+function isCongrats(pred,cd){
+  if(!pred) return false;
+  if(pred.daysSince<30) return false;
+  const ovDayDate=pred.ovDateCur;
+  const lo=addDays(ovDayDate,-4), hi=addDays(ovDayDate,3);
+  return cd.entries.some(e=>{ const dt=parseD(e.date); return dt>=lo && dt<=hi; });
+}
+
+function vibe(cd,pred){
+  if(isCongrats(pred,cd)) return {emoji:'🎉',head:'Congrats, Mom & Dad?',sub:'Chic Chic landed in the Date Night window and the period is 30+ days late. A cheeky guess — go check! 😄',grad:'linear-gradient(135deg,#4a2f6e,#241436)',color:'#e7caff'};
+  const t=chicTier(cd.thisCycleDays);
+  const m={
+    asap:{grad:'linear-gradient(135deg,#5a1f2a,#2a0e16)',color:'#f3a8b6'},
+    cold:{grad:'linear-gradient(135deg,#1f3550,#0e1a2a)',color:'#a6cdee'},
+    meh :{grad:'linear-gradient(135deg,#3a3012,#1f1a0a)',color:'#ead592'},
+    good:{grad:'linear-gradient(135deg,#5a2a44,#2a1320)',color:'#f2afd2'},
+    super:{grad:'linear-gradient(135deg,#5a341a,#2a1708)',color:'#f3b673'},
+  }[t.cls];
+  return {emoji:t.e,head:t.t,sub:`${cd.thisCycleDays} day${cd.thisCycleDays===1?'':'s'} of Chic Chic this cycle`,grad:m.grad,color:m.color};
+}
+
+function chicNudge(cd){
+  if(cd.loggedToday) return {t:`Logged today 🎉 — keep it playful`, cls:'love'};
+  if(cd.beatingRecord) return {t:`🏆 New record stretch — ${cd.currentGap} days, longest yet. Bar's officially set.`, cls:'warn'};
+  if(cd.nearRecord){ const g=cd.recordGap-cd.currentGap; return {t: g<=0?`👀 About to match your longest stretch ever (${cd.recordGap}d)… really?`:`👀 ${g} day${g===1?'':'s'} from your longest stretch ever (${cd.recordGap}d)… really gonna let it happen?`, cls:'warn'}; }
+  return null;
+}
+
+function ordinal(n){ const s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+function annInfo(d){
+  if(!d.wedding) return null;
+  const w=parseD(d.wedding), today=midnight(new Date());
+  if(today<w) { // not married yet — count down to the wedding itself
+    const days=Math.round((w-today)/DAY);
+    return {beforeWedding:true, daysToWedding:days, wedding:w};
+  }
+  const wd=w.getDate();
+  // months together (whole months elapsed)
+  let months=(today.getFullYear()-w.getFullYear())*12+(today.getMonth()-w.getMonth());
+  if(today.getDate()<wd) months--;
+  // next monthly occurrence (same day-of-month)
+  let nm=new Date(today.getFullYear(),today.getMonth(),wd); if(nm<today||nm.getDate()!==wd) nm=new Date(today.getFullYear(),today.getMonth()+1,wd);
+  let nmMonths=(nm.getFullYear()-w.getFullYear())*12+(nm.getMonth()-w.getMonth());
+  const daysToMonthly=Math.round((nm-today)/DAY);
+  // next yearly occurrence
+  let ny=new Date(today.getFullYear(),w.getMonth(),wd); if(ny<today) ny=new Date(today.getFullYear()+1,w.getMonth(),wd);
+  const nextYears=ny.getFullYear()-w.getFullYear();
+  const daysToYearly=Math.round((ny-today)/DAY);
+  const monthlyToday=(today.getDate()===wd);
+  const yearlyToday=(today.getMonth()===w.getMonth() && today.getDate()===wd);
+  const years=Math.floor(months/12);
+  return {beforeWedding:false,wedding:w,months,years,monthlyToday,yearlyToday,
+    nextMonthly:nm,nmMonths,daysToMonthly,nextYearly:ny,nextYears,daysToYearly};
+}
+
+/* ============================================================
+   MODES — cycle → pregnant → postpartum → cycle
+   Nothing here replaces old data. New keys only:
+     preg        {lmp,testDate,edd,appts[]}   set while pregnant
+     post        {since,outcome,babyDob,babyName}  set after pregnancy mode closes
+     pregHistory [ ...closed pregnancies ]
+     snoozeUntil 'YYYY-MM-DD'  hides the "what happened?" question
+   Mode is DERIVED from these, so the app can never sit in a dead end:
+     preg set                         → pregnant
+     post set, no period logged since → postpartum (cycle paused)
+     otherwise                        → cycle
+   ============================================================ */
+const SCHEMA=3;
+const LONG_GAP=90;   // a gap this long between period starts is a pause, not a cycle
+let pregPeek=0, forceAsk=(location.hash==='#confirm');
+
+// week: [emoji, size-of, length, weight]  — average figures, every baby differs
+const SIZES={
+  4:['🌱','a poppy seed','~1 mm',''],5:['🌱','a sesame seed','~2 mm',''],6:['🫘','a lentil','~5 mm',''],
+  7:['🫐','a blueberry','~1 cm',''],8:['🍇','a raspberry','~1.6 cm','~1 g'],9:['🍇','a grape','~2.3 cm','~2 g'],
+  10:['🍓','a strawberry','~3.1 cm','~4 g'],11:['🍓','a fig','~4.1 cm','~7 g'],12:['🍋','a lime','~5.4 cm','~14 g'],
+  13:['🍋','a lemon','~7.4 cm','~23 g'],14:['🍑','a peach','~8.7 cm','~43 g'],15:['🍎','an apple','~10 cm','~70 g'],
+  16:['🥑','an avocado','~11.6 cm','~100 g'],17:['🍐','a pear','~13 cm','~140 g'],18:['🫑','a capsicum','~14 cm','~190 g'],
+  19:['🥭','a mango','~15 cm','~240 g'],20:['🍌','a banana','~25 cm','~300 g'],21:['🥕','a carrot','~27 cm','~360 g'],
+  22:['🥭','a papaya','~28 cm','~430 g'],23:['🍊','a grapefruit','~29 cm','~500 g'],24:['🌽','an ear of corn','~30 cm','~600 g'],
+  25:['🥦','a cauliflower','~35 cm','~660 g'],26:['🥬','a lettuce','~36 cm','~760 g'],27:['🥦','a broccoli','~37 cm','~875 g'],
+  28:['🍆','a brinjal','~38 cm','~1 kg'],29:['🎃','a butternut squash','~39 cm','~1.15 kg'],30:['🥬','a cabbage','~40 cm','~1.3 kg'],
+  31:['🥥','a coconut','~41 cm','~1.5 kg'],32:['🥥','a big coconut','~42 cm','~1.7 kg'],33:['🍍','a pineapple','~44 cm','~1.9 kg'],
+  34:['🍈','a muskmelon','~45 cm','~2.1 kg'],35:['🍈','a honeydew melon','~46 cm','~2.4 kg'],36:['🥬','a big papaya','~47 cm','~2.6 kg'],
+  37:['🎃','a winter melon','~49 cm','~2.9 kg'],38:['🎃','a pumpkin','~50 cm','~3.1 kg'],39:['🍉','a small watermelon','~51 cm','~3.3 kg'],
+  40:['🍉','a watermelon','~51 cm','~3.5 kg']
+};
+const MILE={
+  4:'Just implanted — a tiny ball of cells settling in.',5:'The neural tube and the heart are starting to form.',
+  6:'The heart begins to beat around now.',7:'Arm and leg buds appear; the brain is growing fast.',
+  8:'Fingers and toes are starting to form.',9:'All the main organs have begun to form.',
+  10:'Officially a fetus now. Tiny nails are starting.',11:'Stretching and kicking — still too small to feel.',
+  12:'Reflexes kick in: fingers open and close.',13:'Fingerprints are forming. Last week of the first trimester.',
+  14:'Second trimester. Can squint and frown.',15:'Can sense light through closed eyelids.',
+  16:'Ears are developing; hearing is on its way.',17:'Starting to put on a little fat.',
+  18:'First flutters may be felt any week now.',19:'A protective coating (vernix) covers the skin.',
+  20:'Halfway there!',21:'Movements are getting stronger.',22:'Eyebrows and lips are clearly formed.',
+  23:'Can hear your voices — start talking.',24:'The lungs are developing fast.',
+  25:'Responds to familiar voices and sounds.',26:'The eyes begin to open.',27:'Sleeps and wakes on a regular rhythm.',
+  28:'Third trimester. Can blink.',29:'Bones are hardening; kicks are strong.',30:'The brain is growing very quickly.',
+  31:'Can turn the head from side to side.',32:'Practising breathing movements.',33:'The immune system is developing.',
+  34:'Fingernails reach the fingertips.',35:'Mostly gaining weight from here.',36:'May start dropping lower into the pelvis.',
+  37:'Early term — nearly ready.',38:'Has a firm grasp.',39:'Full term.',40:'Due week — any day now.'
+};
+// week: [what's developing, [three things for her this week], tests & checks] — general guidance; the doctor's advice comes first
+const WEEKLY={
+4:["The embryo has implanted and the placenta is starting to form. The layers that become the brain, heart and gut are being laid down.",["Folic acid every day — the most important supplement right now","No alcohol or smoking; check any regular medicines with the doctor","Tea and coffee: about 2 cups a day at most"],"Book the first doctor's visit. A home test is enough for now."],
+5:["The neural tube — the start of the brain and spinal cord — is forming and closes by the end of next week. The heart begins to form.",["Folic acid daily: it directly supports the neural tube","Iodised salt, well-cooked eggs, pasteurised milk","Small, frequent meals if nausea starts"],"First visit: confirm the pregnancy, review medicines, start prenatal vitamins."],
+6:["The heart starts beating and the neural tube closes. Tiny buds for the arms and legs appear.",["Nausea builds over the next weeks: a dry snack before getting up, ginger, sips of fluid","Rest when tired — fatigue is normal now","Keep taking folic acid"],"Dating scan, usually between 6 and 9 weeks. First blood tests (blood group, haemoglobin, sugar, thyroid, infection screen) and a urine test."],
+7:["The brain is growing fast and dividing into its main regions. Arms, legs and the face begin to take shape.",["2–3 litres of fluid a day","Avoid raw or undercooked meat, fish and eggs, and unwashed salads","Gentle walks of 15–20 minutes when she feels up to it"],"Dating scan and first blood tests, if not done yet."],
+8:["Fingers and toes begin to form, and nerve cells in the brain are branching out to connect with each other.",["Protein at every meal: dal, eggs, curd, paneer, lean meat","Vitamin B6 can help with nausea — ask the doctor","Can't keep anything down for a day → call the doctor"],"Dating scan window continues (6–9 weeks)."],
+9:["All the main organs have started forming, and the heart now has four chambers.",["Fibre and water to keep constipation away","Dental check-up: gums are more sensitive in pregnancy","Keep walking; avoid getting overheated"],"Ask about first-trimester screening and book the NT scan for weeks 11–13."],
+10:["The most delicate stage of organ formation is done; from here it is growth. Nails and tooth buds are forming.",["Calcium foods: milk, curd, ragi, sesame","Start pelvic-floor exercises (Kegels)","The flu vaccine is safe in any trimester — ask about it"],"NIPT, a blood test that screens for chromosome conditions, is possible from 10 weeks if you choose it."],
+11:["Bones begin to harden, and the baby is moving — still too small to feel.",["Vitamin D and calcium foods for bone building","Walk 20–30 minutes most days","Small meals, often; nausea usually starts easing soon"],"NT scan with the double-marker blood test: between 11 weeks and 13 weeks 6 days."],
+12:["Reflexes appear: fingers curl and toes flex. The kidneys start making urine.",["Iron-rich foods: greens, dates, pulses, meat — with lemon or amla to absorb it","Keep folic acid going until the doctor changes the prescription","Supportive bra and loose waistbands"],"NT scan and double marker this week or next, if not done."],
+13:["Fingerprints form and the vocal cords develop. The placenta has taken over most of the hormone work.",["Energy usually returns from here — build a daily walking habit","One extra healthy snack is enough; eating for two is a myth","Sunscreen: skin pigments more easily now"],"Last week for the NT scan (up to 13 weeks 6 days)."],
+14:["Second trimester. The facial muscles work, so the baby can frown and squint. Fine hair starts to grow.",["Iron and calcium tablets usually start now — take them at different times of day","About 300–350 extra calories a day: one good snack","30 minutes of walking or prenatal yoga most days"],"Routine visit: weight, blood pressure, urine."],
+15:["The baby senses light, taste buds are forming, and the bones keep hardening.",["Iron tablet with vitamin C — not with tea, coffee or milk","Omega-3 (DHA) for the brain: low-mercury fish twice a week, or walnuts and flaxseed; ask about a DHA supplement","A pillow between the knees if the back aches at night"],"If first-trimester screening was missed, the quadruple marker blood test is done between 15 and 20 weeks."],
+16:["The tiny bones of the ear are in place, the first step to hearing. The eyes can move slowly.",["Talk and play music — hearing develops over the coming weeks","Calcium: 3 servings of milk, curd or paneer a day","Stand up slowly; blood pressure runs lower in this trimester"],"Routine visit. Book the anomaly scan for weeks 18–22."],
+17:["Fat begins to form under the skin, and the cord grows thicker and stronger.",["More protein: add an egg, a bowl of dal or a glass of milk","Strengthen the back with prenatal yoga or swimming","Moisturise the tummy; itching is common as the skin stretches"],"Nothing routine this week. The anomaly scan comes at 18–22 weeks."],
+18:["A protective coating (myelin) starts forming around the nerves, which speeds up their signals. First flutters may be felt between now and week 22.",["Healthy fats for nerve development: nuts, seeds, fish","Note the day she first feels movement","Avoid lying flat on the back for long stretches"],"Anomaly scan: a detailed head-to-toe check, done between 18 and 22 weeks."],
+19:["The brain areas for smell, taste, hearing, sight and touch are developing. A waxy coating (vernix) protects the skin.",["Iron matters more now — blood volume is rising fast","Fibre, fruit and water against constipation","Keep the 30-minute walk"],"Anomaly scan, if not done yet."],
+20:["Halfway. The baby swallows fluid and has its own pattern of sleep and activity.",["Sudden swelling of the face or hands, a strong headache or blurred vision → call the doctor","Check weight gain and diet with the doctor at this visit","Supportive footwear; feet can swell"],"Anomaly scan window closes at 22 weeks. Blood pressure and urine are checked at every visit from here."],
+21:["Movements become stronger and more coordinated. The gut starts practising digestion.",["Calcium and vitamin D for fast bone growth","Leg cramps: stretch the calves before bed and stay hydrated","Lying on the side is the most comfortable for sleep"],"Nothing routine this week."],
+22:["Lips, eyelids and eyebrows are distinct, and the sense of touch is developing.",["Small meals and sitting upright after eating — heartburn starts around now","Go easy on sugar and refined carbs","Kegels every day"],"Last week for the anomaly scan. Book the glucose test for weeks 24–28."],
+23:["Hearing works: the baby reacts to voices and loud sounds. The lungs are forming their blood vessels.",["Talk, read or sing — familiar voices are recognised after birth","Protein and iron with every main meal","A short walk after meals helps blood sugar"],"Nothing routine this week."],
+24:["The lungs begin making surfactant, the substance that lets them inflate after birth.",["Follow the lab's instructions exactly for the glucose test","Burning when passing urine needs a check — infections are common and treatable","Feet up when the ankles swell"],"Glucose tolerance test for gestational diabetes: between 24 and 28 weeks."],
+25:["The surface of the brain starts to fold as it grows. Hands can grasp, and the baby responds to touch on the tummy.",["DHA foods for brain growth: fish, walnuts, flaxseed","Take the iron tablet regularly — unusual tiredness or breathlessness can mean low haemoglobin","A good time to book prenatal classes"],"Glucose test, if not done."],
+26:["The eyes begin to open and respond to light. The brain is now processing sound.",["Sleep on the side, with pillows for support","Stay active: walking, swimming or yoga for 30 minutes","Plenty of water; salt in moderation"],"Glucose test window continues to 28 weeks."],
+27:["The baby sleeps and wakes in a regular rhythm and may hiccup. The brain is very active.",["Ask about the whooping cough (Tdap) vaccine — usually given between 27 and 36 weeks","Start noticing the baby's daily movement pattern","Calcium and protein stay high priority"],"Glucose test if pending. Haemoglobin is usually rechecked around 28 weeks."],
+28:["Third trimester. The eyes blink, and the brain is adding connections at a huge rate — it roughly triples in weight over these last weeks.",["From now, go to sleep on the side, not the back","Know the usual movement pattern; if movements reduce, call the hospital the same day","About 450 extra calories a day; keep protein, iron, calcium and DHA up"],"Haemoglobin recheck. Anti-D injection if her blood group is Rh negative. Visits usually become fortnightly."],
+29:["The bones are fully formed but still soft, and take in a lot of calcium every day. Muscles and lungs keep maturing.",["Calcium daily without fail","Iron foods plus the tablet — demand peaks in this trimester","Shorter walks, more often, if long ones are tiring"],"Routine visit: blood pressure, urine, the baby's growth."],
+30:["The brain is growing fast and its surface is becoming deeply folded. The baby can tell light from dark.",["DHA and protein for brain growth","Heartburn: small meals, early dinner, head raised at night","Visit the hospital and decide the route"],"Routine visit."],
+31:["All five senses work. The baby is gaining weight quickly and can turn the head.",["Good fats and protein support healthy weight gain","Practise breathing and relaxation","Movements should stay as frequent as before, even if they feel different"],"Routine visit. A growth scan is often done between 32 and 36 weeks."],
+32:["The baby practises breathing, and most babies settle head-down over the coming weeks.",["Rest on the side; avoid long hours standing","Fibre and fluids — constipation peaks now","Finalise leave, help at home and the baby's doctor"],"Growth scan (32–36 weeks) checks size, fluid and position."],
+33:["The immune system is developing, and antibodies pass from mother to baby. The skull stays soft for birth.",["Flu and whooping cough vaccines, if not taken yet","Iron and protein to build stores for delivery","Know the labour signs: regular contractions, waters breaking, bleeding"],"Growth scan, if advised."],
+34:["The lungs and nervous system are nearly mature. Fat fills out the arms and legs.",["Pack the hospital bag","Keep walking; ask the doctor about birthing-ball exercises","Small, frequent meals — the stomach has little room"],"Routine visit. Talk through the birth plan."],
+35:["The kidneys are fully developed and the liver is working. Growth is mostly weight gain now.",["Reports, ID and insurance papers in one folder","Keep the daily movement check","Stay hydrated; rest in the afternoon"],"Routine visit. The baby's position is checked."],
+36:["The baby may drop lower into the pelvis. The lungs are almost ready.",["Breathing gets easier and bathroom trips increase — keep drinking water","Gentle walking helps the baby settle into position","Sleep whenever possible"],"Visits become weekly. Some hospitals take a Group B strep swab at 36–37 weeks."],
+37:["Early term. The baby practises breathing, sucking and gripping.",["Phone charged, bag by the door, transport sorted","Light, regular meals and plenty of fluids","Call the hospital for regular contractions, waters breaking, bleeding or fewer movements"],"Weekly check: blood pressure, urine, the baby's position and heartbeat."],
+38:["The brain and lungs keep maturing right up to birth. The grasp is firm.",["Short walks and rest in equal measure","Keep watching the usual movement pattern","Sleep whenever she can"],"Weekly check."],
+39:["Full term. The baby has enough fat to stay warm after birth.",["Stay close to home and the hospital","Eat light and stay hydrated","Any doubt about movements, fluid or bleeding → go in"],"Weekly check. The doctor may discuss the plan if the due date passes."],
+40:["Due week. Only about 1 in 20 babies arrive on the exact date.",["Keep moving gently","Rest — labour needs energy","Go in for contractions about 5 minutes apart, waters breaking, bleeding or fewer movements"],"Check-up with monitoring of the baby's heartbeat and fluid, and a plan for going past the date."]
+};
+const TRI=[
+  {n:1,label:'First trimester', nick:'Sprout Season', emoji:'🌱',color:'#4fc7a8',grad:'linear-gradient(135deg,#17403a,#0c1f1d)',tc:'#9fe3d0',
+   quip:"<b>Sprout Season.</b> Nausea, tiredness and a very sharp nose. Small meals, early nights — and you take over anything that smells."},
+  {n:2,label:'Second trimester',nick:'Golden Stretch',emoji:'☀️',color:'#e8a24a',grad:'linear-gradient(135deg,#4d3413,#241708)',tc:'#f3cd8f',
+   quip:"<b>Golden Stretch.</b> Energy is back and the bump shows up. Best window for a trip, the big scan and the baby list."},
+  {n:3,label:'Third trimester', nick:'Home Stretch',  emoji:'🏠',color:'#d98bb0',grad:'linear-gradient(135deg,#4c2440,#22101d)',tc:'#f2b9d6',
+   quip:"<b>Home Stretch.</b> Heavy, warm and sleeping badly. Bag packed, hospital route known, phone always charged."},
+];
+// Colour drifts a little every day of the pregnancy: green → amber → coral → plum (same as the widget)
+// [week, card top, card bottom, accent]
+const SHADES=[[4,'#17403a','#0c1f1d','#7fdcc4'],[17,'#4d3413','#241708','#f0c178'],[30,'#54281f','#27110c','#f5b59a'],[40,'#4c2440','#22101d','#f2b9d6']];
+function mix(a,b,t){ const h=x=>[1,3,5].map(i=>parseInt(x.slice(i,i+2),16)); const A=h(a),B=h(b);
+  return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join(''); }
+function shade(weeks){
+  const w=Math.max(SHADES[0][0],Math.min(SHADES[SHADES.length-1][0],weeks));
+  let i=0; while(i<SHADES.length-2 && w>SHADES[i+1][0]) i++;
+  const a=SHADES[i], b=SHADES[i+1], t=(w-a[0])/(b[0]-a[0]);
+  return {grad:`linear-gradient(135deg,${mix(a[1],b[1],t)},${mix(a[2],b[2],t)})`, accent:mix(a[3],b[3],t)};
+}
+// typical windows only — the doctor sets the real schedule
+const GUIDE=[
+  {t:'First visit & dating scan',a:6,b:9},{t:'NT scan & first screening',a:11,b:13.86},
+  {t:'Anomaly scan',a:18,b:22},{t:'Glucose test',a:24,b:28},{t:'Growth scan',a:32,b:36},{t:'Full term',a:37,b:40}
+];
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function plusDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return midnight(x); }
+function dayDiff(a,b){ return Math.round((midnight(a)-midnight(b))/DAY); }
+function isDate(s){ return typeof s==='string' && /^\d{4}-\d{2}-\d{2}$/.test(s); }
+function todayStr(){ return isoLocal(midnight(new Date())); }
+
+function modeOf(d){
+  if(d.preg && d.preg.lmp) return 'preg';
+  if(d.post && d.post.since){ const last=d.starts.length?d.starts[d.starts.length-1]:null; if(!last || last<=d.post.since) return 'post'; }
+  return 'cycle';
+}
+/* stretches where Chic Chic gaps shouldn't count as a "record" (pregnancy → first period back) */
+function pauses(d){
+  const out=[];
+  (d.pregHistory||[]).forEach(h=>{ const from=h.testDate||h.lmp; if(!from) return;
+    const back=d.starts.find(s=>s>(h.endDate||from)); out.push([from, back||null]); });
+  if(d.preg && d.preg.lmp) out.push([d.preg.testDate||d.preg.lmp, null]);
+  return out;
+}
+function pregInfo(d,peek){
+  const pg=d.preg, today=midnight(new Date());
+  const fromScan=isDate(pg.edd);
+  const edd=fromScan?parseD(pg.edd):plusDays(parseD(pg.lmp),280);
+  const lmpEff=plusDays(edd,-280);
+  const ga=Math.max(0,dayDiff(today,lmpEff));
+  const week=Math.floor(ga/7), day=ga%7;
+  const tri=TRI[week<14?0:week<28?1:2];
+  const daysToDue=dayDiff(edd,today);
+  const showWeek=Math.max(4,Math.min(40,week+(peek||0)));
+  const size=SIZES[showWeek], mile=MILE[showWeek];
+  const appts=(pg.appts||[]).slice().sort((a,b)=>a.date<b.date?-1:1);
+  const next=appts.find(a=>a.date>=isoLocal(today))||null;
+  return {today,edd,lmpEff,fromScan,ga,week,day,tri,daysToDue,showWeek,size,mile,appts,next,frac:Math.min(1,ga/280)};
+}
+function babyAge(dobStr){
+  const dob=parseD(dobStr), today=midnight(new Date()); const days=dayDiff(today,dob);
+  if(days<0) return null;
+  if(days<84){ const w=Math.floor(days/7), r=days%7; return w?`${w} week${w===1?'':'s'}${r?` ${r} day${r===1?'':'s'}`:''}`:`${days} day${days===1?'':'s'}`; }
+  let m=(today.getFullYear()-dob.getFullYear())*12+(today.getMonth()-dob.getMonth()); if(today.getDate()<dob.getDate()) m--;
+  if(m<24) return `${m} month${m===1?'':'s'}`;
+  const y=Math.floor(m/12), r=m%12; return `${y} year${y===1?'':'s'}${r?` ${r} month${r===1?'':'s'}`:''}`;
+}
+function commit(d){ d=normalize(d); saveLocal(d); render(true); syncPush(d); }
+function whenTxt(n){ return n===0?'today':n===1?'tomorrow':n>0?`in ${n} days`:`${-n} day${n===-1?'':'s'} ago`; }
+
+/* ---------- shared blocks ---------- */
+function topHTML(){ return `<div class="top"><div class="brand"><span class="moon"></span> Chic Chic</div><div class="gear" onclick="openSheet()">⚙</div></div>
+    <div class="sync" id="syncLine"><span class="sdot"></span>Syncing…</div>`; }
+function chicBlockHTML(cd,scope){
+  return `<div class="chic">
+      <div><div class="chic-k">✨ Chic Chic</div>
+      <div class="chic-v">${cd.loggedToday?'Today 🎉':(cd.daysAgo!=null?cd.daysAgo+' day'+(cd.daysAgo===1?'':'s')+' ago':'None logged yet')}</div>
+      <div class="chic-sub">${cd.last?'Last on '+fmt(cd.last)+' · '+scope:'Add one in settings ⚙'}</div></div>
+      <button class="chic-btn" onclick="openSheet()">＋ Log</button>
+    </div>
+    ${cd.total>=2?`<div class="ccstats">
+      <div class="ccs"><div class="ccs-v">${cd.currentGap}d</div><div class="ccs-k">Current gap</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.avgGap!=null?cd.avgGap+'d':'—'}</div><div class="ccs-k">Avg gap</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.thisMonth}</div><div class="ccs-k">This month</div></div>
+    </div>`:''}`;
+}
+
+/* ---------- "what happened?" — the app can only guess, so it asks ---------- */
+function askHTML(pred,congrats){
+  const why = pred.isLate ? `The period is ${pred.daysLate} day${pred.daysLate===1?'':'s'} late.` : `Day ${pred.dayInCycle} of this cycle.`;
+  return `<div class="ask" id="askCard">
+    <div class="ask-h">${congrats?'🎉':'👀'} So… what happened?</div>
+    <div class="ask-s">${why} The app can only guess — tell it, and it moves on.</div>
+    <div class="ask-b">
+      <button onclick="askYes()">✅ Test positive</button>
+      <button onclick="askPeriod()">🩸 Period came</button>
+      <button onclick="askWait()">⏳ Still waiting</button>
+    </div></div>`;
+}
+function clearAsk(){ forceAsk=false; if(location.hash) try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+function askYes(){
+  const d=loadLocal(); const lmp=d.starts.length?d.starts[d.starts.length-1]:todayStr();
+  openM(`<h2>🤰 Start pregnancy mode</h2>
+    <p class="lead">Cycle predictions pause. Every period date and Chic Chic entry stays exactly as it is.</p>
+    <div class="field"><label>Positive test on</label><input type="date" id="mTest" value="${todayStr()}" max="${todayStr()}"></div>
+    <div class="field"><label>First day of last period</label><input type="date" id="mLmp" value="${lmp}">
+      <div class="hint">Weeks and the due date are counted from this. A scan date can replace it later.</div></div>
+    <button class="btn" onclick="startPreg()">Start</button>
+    <button class="btn ghost" onclick="closeM()">Cancel</button>`);
+}
+function startPreg(){
+  const lmp=document.getElementById('mLmp').value, test=document.getElementById('mTest').value||todayStr();
+  if(!isDate(lmp)){ alert('Add the first day of the last period 🙂'); return; }
+  const d=loadLocal(); d.preg={lmp, testDate:test, edd:null, appts:[]}; d.snoozeUntil=null;
+  clearAsk(); pregPeek=0; closeM(true); commit(d);
+}
+function askPeriod(){ clearAsk(); openSheet(); }
+function askWait(){ const d=loadLocal(); d.snoozeUntil=isoLocal(plusDays(new Date(),3)); clearAsk(); commit(d); }
+
+/* ---------- pregnancy screen ---------- */
+function renderPreg(d,keepSync){
+  const pi=pregInfo(d,pregPeek), t=pi.tri, cd=chicInfo(d,null);
+  const look=shade(pi.ga/7);   // today's colour
+  const R=100, CIRC=2*Math.PI*R, off=CIRC*(1-pi.frac);
+  const weeksLeft=Math.max(0,Math.ceil(pi.daysToDue/7));
+  const peeking=pi.showWeek!==Math.max(4,Math.min(40,pi.week));
+  const over=pi.daysToDue<0, wk=WEEKLY[pi.showWeek];
+  const cardLook=peeking?shade(pi.showWeek):look;   // peeking at another week shows that week's colour
+  const ann=annInfo(d); let annBanner='';
+  if(ann && !ann.beforeWedding){
+    if(ann.yearlyToday) annBanner=`<div class="ann-fest"><div class="af-e">💍🎉</div><div><div class="af-h">Happy Anniversary!</div><div class="af-s">${ann.years} year${ann.years===1?'':'s'} together today 🥂</div></div></div>`;
+    else if(ann.monthlyToday) annBanner=`<div class="banner love">💕 ${ann.months} month${ann.months===1?'':'s'} together today</div>`;
+  }
+  const guide=GUIDE.map(g=>{ const a=plusDays(pi.lmpEff,Math.round(g.a*7)), b=plusDays(pi.lmpEff,Math.round(g.b*7));
+    const w=pi.ga/7, st=w>g.b+0.15?'done':w>=g.a?'now':'';
+    return `<div class="pcard ${st==='now'?'active':''}" style="${st==='done'?'opacity:.5':''}"><div class="pemoji">${st==='done'?'✓':st==='now'?'📍':'·'}</div>
+      <div class="pmeta"><div class="pname" style="color:${st==='now'?look.accent:'var(--txt)'}">${g.t}</div><div class="pdesc">${fmt(a)} – ${fmt(b)}</div></div>
+      <div class="prange">Wk ${g.a}–${Math.floor(g.b)}</div></div>`; }).join('');
+  const appts=pi.appts.length?pi.appts.map(a=>{ const n=dayDiff(parseD(a.date),pi.today);
+    return `<div class="arow" style="${n<0?'opacity:.5':''}"><div><div class="at">${esc(a.title)}</div><div class="ad">${fmtFull(parseD(a.date))} · ${whenTxt(n)}</div></div><button onclick="removeAppt('${esc(a.id)}')">×</button></div>`; }).join('')
+    :`<div class="empty" style="margin-bottom:10px">No appointments yet. Add the next scan or visit and it shows on the widget too.</div>`;
+
+  document.getElementById('app').innerHTML=`
+    ${topHTML()}
+    ${annBanner}
+    ${over?`<div class="banner warn">📅 Past the due date. If the baby is here, open ⚙ → Pregnancy settings.</div>`:''}
+    <div class="hero"><div class="ring">
+      <svg width="230" height="230" viewBox="0 0 230 230">
+        <circle cx="115" cy="115" r="${R}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="15"/>
+        <circle cx="115" cy="115" r="${R}" fill="none" stroke="${look.accent}" stroke-width="15" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${off}"/>
+      </svg>
+      <div class="center">
+        <div class="emoji">${SIZES[Math.max(4,Math.min(40,pi.week))][0]}</div>
+        <div class="phase">${pi.week}w ${pi.day}d</div>
+        <div class="dayline">Trimester ${t.n} · ${weeksLeft} week${weeksLeft===1?'':'s'} to go</div>
+      </div>
+    </div></div>
+
+    <div class="status" style="background:${cardLook.grad};color:${cardLook.accent}">
+      <div class="se">${pi.size[0]}</div>
+      <div style="flex:1;min-width:0"><div class="sh">${peeking?'Week '+pi.showWeek+': the':'The'} size of ${pi.size[1]}</div>
+        <div class="ss">${pi.size[2]} ${pi.showWeek>=20?'head to toe':'long'}${pi.size[3]?' · '+pi.size[3]:''}<br>${pi.mile}</div></div>
+    </div>
+    <div class="weeknav">
+      <button onclick="weekStep(-1)" ${pi.showWeek<=4?'disabled':''}>‹ Week ${pi.showWeek-1}</button>
+      <button onclick="weekStep(0)" ${peeking?'':'disabled'}>This week</button>
+      <button onclick="weekStep(1)" ${pi.showWeek>=40?'disabled':''}>Week ${pi.showWeek+1} ›</button>
+    </div>
+
+    <div class="wk" style="--acc:${cardLook.accent}">
+      <div class="wk-t">Week ${pi.showWeek}${peeking?'':' · this week'}</div>
+      <div class="wk-k">🧠 Developing now</div>
+      <div class="wk-p">${wk[0]}</div>
+      <div class="wk-k">🥗 For her this week</div>
+      <ul>${wk[1].map(x=>`<li>${x}</li>`).join('')}</ul>
+      <div class="wk-k">🧪 Tests &amp; checks</div>
+      <div class="wk-p">${wk[2]}</div>
+      <div class="wk-w">Call the doctor the same day for bleeding, severe tummy pain, leaking fluid, fever, a severe headache or vision changes${pi.showWeek>=28?', or fewer movements':''}.</div>
+    </div>
+
+    <div class="quip">${t.quip}</div>
+
+    <div class="grid2">
+      <div class="stat"><div class="k">📅 Due date</div>
+        <div class="v">${fmt(pi.edd)} <small>'${String(pi.edd.getFullYear()).slice(2)}</small></div>
+        <div class="sub">${whenTxt(pi.daysToDue)} · ${pi.fromScan?'from scan':'from last period'}</div></div>
+      <div class="stat"><div class="k">🩺 Next up</div>
+        <div class="v">${pi.next?esc(pi.next.title):'—'}</div>
+        <div class="sub">${pi.next?fmt(parseD(pi.next.date))+' · '+whenTxt(dayDiff(parseD(pi.next.date),pi.today)):'nothing logged'}</div></div>
+    </div>
+
+    <div class="section-t">The 40 weeks</div>
+    <div class="timeline">
+      <div class="marker"><div class="dot" style="left:${Math.min(99,pi.frac*100)}%"></div></div>
+      <div class="bar" style="background:linear-gradient(90deg,${SHADES[0][3]} 0%,${SHADES[0][3]} 10%,${SHADES[1][3]} 42.5%,${SHADES[2][3]} 75%,${SHADES[3][3]} 100%)"></div>
+      <div class="legend">${TRI.map((x,k)=>`<div class="lg"><span class="sw" style="background:${shade([8,21,36][k]).accent}"></span>${x.nick}</div>`).join('')}</div>
+    </div>
+
+    <div class="section-t">Appointments</div>
+    ${appts}
+    <div class="addrow" style="margin-bottom:8px"><input type="date" id="apDate" value="${todayStr()}"></div>
+    <div class="addrow" style="margin-bottom:6px"><input type="text" id="apTitle" placeholder="e.g. NT scan" maxlength="40"><button type="button" class="mini-btn" onclick="addAppt()">Add</button></div>
+
+    <div class="section-t">What usually happens when</div>
+    <div class="phaselist">${guide}</div>
+    <div class="cal-pred-note" style="margin-bottom:6px">Typical windows only — your doctor sets the real schedule.</div>
+
+    ${namesHTML(d,pi.week>=NAMES_FROM)}
+
+    <div class="section-t">Still on the board</div>
+    ${chicBlockHTML(cd,cd.thisMonth+' this month')}
+    <div id="chiccal"></div>
+
+    <div class="foot">Weeks, sizes and dates are averages counted from the ${pi.fromScan?'scan due date':'last period'} — every pregnancy differs, and a scan date beats the estimate. The weekly tips and test timings are general guidance; her doctor's advice comes first.<br><br>Made with 🤍 for the three of you.</div>
+  `;
+  renderChicCalendar(d);
+  if(!keepSync) syncPull(true);
+}
+function weekStep(n){ pregPeek = n===0?0:pregPeek+n; render(true); }
+function addAppt(){
+  const date=document.getElementById('apDate').value, title=(document.getElementById('apTitle').value||'').trim();
+  if(!isDate(date)||!title){ alert('Add a date and a name 🙂'); return; }
+  const d=loadLocal(); if(!d.preg) return; d.preg.appts=(d.preg.appts||[]).concat({id:uid(date),date,title}); commit(d);
+}
+function removeAppt(id){ const d=loadLocal(); if(!d.preg) return; d.preg.appts=(d.preg.appts||[]).filter(a=>a.id!==id); commit(d); }
+
+function openPregSettings(){
+  const d=loadLocal(), pg=d.preg; document.getElementById('sheet').classList.remove('show');
+  openM(`<h2>🤰 Pregnancy settings</h2>
+    <p class="lead">Dates the week count runs on.</p>
+    <div class="field"><label>First day of last period</label><input type="date" id="mLmp" value="${pg.lmp}"></div>
+    <div class="field"><label>Due date from scan (optional)</label><input type="date" id="mEdd" value="${pg.edd||''}">
+      <div class="hint">If the doctor gives a due date, enter it — everything recalculates from it. Clear it to go back to the last-period estimate.</div></div>
+    <div class="field"><label>Positive test on</label><input type="date" id="mTest" value="${pg.testDate||''}"></div>
+    <button class="btn" onclick="savePreg()">Save</button>
+    <div class="divider" style="margin-top:18px"></div>
+    <div class="field"><label>Baby arrived 👶</label>
+      <div class="addrow" style="margin-bottom:8px"><input type="date" id="mBorn" value="${todayStr()}" max="${todayStr()}"></div>
+      <div class="addrow"><input type="text" id="mName" placeholder="Name (optional)" maxlength="24"><button type="button" class="mini-btn" onclick="endPreg('birth')">Save</button></div>
+      <div class="hint">Switches to baby mode. Cycle tracking restarts by itself when the first period is logged.</div></div>
+    <div class="divider"></div>
+    <div class="field"><label>Close pregnancy mode</label>
+      <div class="exp"><button type="button" onclick="endPreg('ended')">Pregnancy ended</button><button type="button" onclick="cancelPreg()">Entered by mistake</button></div>
+      <div class="hint">Either way nothing is deleted from your period or Chic Chic history.</div></div>
+    <button class="btn ghost" onclick="closeM()">Close</button>`);
+}
+function savePreg(){
+  const d=loadLocal(); const lmp=document.getElementById('mLmp').value, edd=document.getElementById('mEdd').value, test=document.getElementById('mTest').value;
+  if(!isDate(lmp)){ alert('Add the first day of the last period 🙂'); return; }
+  d.preg={...d.preg, lmp, edd:isDate(edd)?edd:null, testDate:isDate(test)?test:d.preg.testDate}; pregPeek=0; closeM(true); commit(d);
+}
+function endPreg(outcome){
+  const d=loadLocal(); if(!d.preg) return;
+  const born=document.getElementById('mBorn').value||todayStr(), name=(document.getElementById('mName').value||'').trim();
+  const endDate = outcome==='birth'?born:todayStr();
+  if(outcome==='ended' && !confirm('Close pregnancy mode? Cycle tracking will restart when the next period is logged.')) return;
+  d.pregHistory=(d.pregHistory||[]).concat({...d.preg, endDate, outcome, babyDob:outcome==='birth'?born:null, babyName:outcome==='birth'?name:''});
+  d.post={since:endDate, outcome, babyDob:outcome==='birth'?born:null, babyName:outcome==='birth'?name:''};
+  d.preg=null; closeM(true); commit(d);
+}
+function cancelPreg(){
+  if(!confirm('Go back to normal cycle tracking?')) return;
+  const d=loadLocal(); d.preg=null; closeM(true); commit(d);
+}
+
+/* ---------- postpartum screen (cycle paused, waiting for the first period) ---------- */
+function renderPost(d,keepSync){
+  const po=d.post, cd=chicInfo(d,null), birth=po.outcome==='birth' && isDate(po.babyDob);
+  const age=birth?babyAge(po.babyDob):null, nm=po.babyName?esc(po.babyName):'Baby';
+  const days=dayDiff(new Date(),parseD(po.since));
+  const head = birth
+    ? `<div class="status" style="background:linear-gradient(135deg,#27405c,#101d2c);color:#b7d6f2"><div class="se">👶</div><div><div class="sh">${nm} is ${age} old</div><div class="ss">Born ${fmtFull(parseD(po.babyDob))}</div></div></div>`
+    : `<div class="status" style="background:linear-gradient(135deg,#2a2233,#17111d);color:#cfc4d6"><div class="se">🌙</div><div><div class="sh">Cycle tracking is paused</div><div class="ss">It picks up again when the next period is logged. No rush.</div></div></div>`;
+  document.getElementById('app').innerHTML=`
+    ${topHTML()}
+    ${head}
+    <div class="ask">
+      <div class="ask-h">⛈️ Waiting for the first period</div>
+      <div class="ask-s">${birth?`Day ${days} since the birth. It can come back anywhere from about 6 weeks to many months later, usually later with breastfeeding.`:`Day ${days}. Predictions start again from the next period.`} Log it and Date Night, Storm and the calendar all restart with her old averages.</div>
+      <div class="ask-b"><button onclick="openSheet()">🩸 Log period start</button></div>
+    </div>
+    ${birth?namesHTML(d,true):''}
+    ${birth?`<div class="banner warn" style="margin-top:14px">Ovulation returns before the first period, so there is no safe-day guess right now.</div>`:''}
+    <div class="section-t">Still on the board</div>
+    ${chicBlockHTML(cd,cd.thisMonth+' this month')}
+    <div id="chiccal"></div>
+    <div class="foot">Nothing was deleted — every period date and Chic Chic entry is still in ⚙ and in the backup. Not medical advice.<br><br>Made with 🤍</div>
+  `;
+  renderChicCalendar(d);
+  if(!keepSync) syncPull(true);
+}
+function openPostSettings(){
+  const d=loadLocal(), po=d.post; document.getElementById('sheet').classList.remove('show');
+  openM(`<h2>${po.outcome==='birth'?'👶 Baby settings':'Settings'}</h2>
+    ${po.outcome==='birth'?`<div class="field"><label>Name</label><input type="text" id="mName" value="${esc(po.babyName||'')}" maxlength="24"></div>
+    <div class="field"><label>Born on</label><input type="date" id="mBorn" value="${po.babyDob||''}"></div>
+    <button class="btn" onclick="savePost()">Save</button><div class="divider" style="margin-top:18px"></div>`:''}
+    <div class="field"><label>Closed by mistake?</label>
+      <div class="exp"><button type="button" onclick="undoEnd()">↩ Back to pregnancy mode</button></div></div>
+    <button class="btn ghost" onclick="closeM()">Close</button>`);
+}
+function savePost(){
+  const d=loadLocal(); const born=document.getElementById('mBorn').value, name=(document.getElementById('mName').value||'').trim();
+  if(!isDate(born)){ alert('Add the birth date 🙂'); return; }
+  d.post={...d.post, babyDob:born, babyName:name};
+  const h=d.pregHistory&&d.pregHistory[d.pregHistory.length-1]; if(h){ h.babyDob=born; h.babyName=name; }
+  closeM(true); commit(d);
+}
+function undoEnd(){
+  const d=loadLocal(); const h=(d.pregHistory||[]).pop(); if(!h){ closeM(); return; }
+  d.preg={lmp:h.lmp, testDate:h.testDate||null, edd:h.edd||null, appts:h.appts||[]}; d.post=null; closeM(true); commit(d);
+}
+
+/* ---------- name shortlist — either of you suggests, both of you star ---------- */
+const NAMES_FROM=28;   // the list opens by itself in the third trimester
+let namesEarly=false;
+function namesHTML(d,open){
+  const list=(d.names||[]).slice().sort((a,b)=>(b.aj+b.ni)-(a.aj+a.ni) || (a.name<b.name?-1:1));
+  if(!open && !list.length && !namesEarly)
+    return `<div class="section-t">Name shortlist</div><div class="empty" style="margin-bottom:6px">Opens in week ${NAMES_FROM}. <a href="#" onclick="namesEarly=true;render(true);return false" style="color:var(--pink)">Start it now</a></div>`;
+  const stars=(n,who)=>[1,2,3,4,5].map(k=>`<span class="star ${k<=n[who]?'on':''}" onclick="rateName('${n.id}','${who}',${k})">⭐</span>`).join('');
+  const top=list.length&&(list[0].aj+list[0].ni)>0?list[0].id:null;
+  return `<div class="section-t">Name shortlist ⭐</div>
+    ${list.length?list.map(n=>`<div class="nrow${n.id===top?' fav':''}">
+      <div class="nhead"><div class="nname">${n.id===top?'👑 ':''}${esc(n.name)}</div><div class="ntot">${n.aj+n.ni}/10</div><button onclick="removeName('${n.id}')">×</button></div>
+      <div class="nrate"><span class="who">Aj</span><div class="stars">${stars(n,'aj')}</div></div>
+      <div class="nrate"><span class="who">Ni</span><div class="stars">${stars(n,'ni')}</div></div>
+    </div>`).join(''):`<div class="empty" style="margin-bottom:10px">No names yet. Either of you can suggest one; both of you star it. The favourite floats to the top.</div>`}
+    <div class="addrow" style="margin-bottom:6px"><input type="text" id="nmInput" placeholder="Suggest a name" maxlength="30" autocapitalize="words"><button type="button" class="mini-btn" onclick="addName()">Add</button></div>`;
+}
+function addName(){
+  const v=(document.getElementById('nmInput').value||'').trim(); if(!v) return;
+  const d=loadLocal(); d.names=d.names||[];
+  if(d.names.some(n=>n.name.toLowerCase()===v.toLowerCase())){ alert('Already on the list 🙂'); return; }
+  d.names.push({id:uid('n'), name:v, aj:0, ni:0}); namesEarly=true; commit(d);
+}
+function rateName(id,who,k){ const d=loadLocal(); const n=(d.names||[]).find(x=>x.id===id); if(!n) return; n[who]=(n[who]===k?0:k); commit(d); }
+function removeName(id){ const d=loadLocal(); d.names=(d.names||[]).filter(x=>x.id!==id); commit(d); }
+
+/* ---------- second sheet (mode dialogs) ---------- */
+function openM(html){ document.getElementById('mpanel').innerHTML=html; document.getElementById('msheet').classList.add('show'); }
+function closeM(quiet){ document.getElementById('msheet').classList.remove('show'); if(!quiet) render(true); }
+function modeRowHTML(d){
+  const m=d?modeOf(d):'cycle';
+  if(m==='preg') return `<button type="button" class="modebtn" onclick="openPregSettings()">🤰 Pregnancy settings · due date, baby arrived</button>`;
+  if(m==='post') return `<button type="button" class="modebtn" onclick="openPostSettings()">${d.post.outcome==='birth'?'👶 Baby settings':'🌙 Cycle paused · options'}</button>`;
+  return d&&d.starts.length?`<button type="button" class="modebtn" onclick="document.getElementById('sheet').classList.remove('show');askYes()">🤰 We're pregnant — switch mode</button>`:'';
+}
+
+/* ---------- sync (Cloudflare Worker) ---------- */
+function setSync(state,text){
+  const el=document.getElementById('syncLine'); if(!el) return;
+  const cls=state==='ok'?'ok':state==='err'?'err':state==='load'?'load':'';
+  el.innerHTML=`<span class="sdot ${cls}"></span>${text}`;
+}
+function tstamp(x){ const t=x&&x.updatedAt?Date.parse(x.updatedAt):NaN; return isNaN(t)?0:t; }
+async function syncPull(silent){
+  let local=normalize(loadLocal() || {starts:[],entries:[]});
+  if(!silent) setSync('load','Syncing…');
+  try{
+    if(API_BASE.indexOf('__WORKER_URL__')!==-1) throw 0;   // not configured yet
+    const r=await timedFetch(`${basketURL()}?_=${Date.now()}`,{headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}});
+    if(!r.ok) throw 0;
+    const rm=await r.json();
+    const remoteHasData = (Array.isArray(rm.starts)&&rm.starts.length) || rm.start ||
+                          (Array.isArray(rm.entries)&&rm.entries.length) || (Array.isArray(rm.log)&&rm.log.length);
+    // NEWEST DOCUMENT WINS — no union. Whichever side was saved most recently is the truth.
+    const remoteNewer = tstamp(rm) >= tstamp(local);
+    if(remoteHasData && remoteNewer){
+      if(silent && tstamp(rm)>0 && tstamp(rm)===tstamp(local) && rm.v>=SCHEMA){ setSync('ok','Synced'); return; }  // nothing new — don't redraw over what's being typed
+      // a copy saved by an older app version has no mode keys: keep ours instead of losing them
+      const legacy=!(rm.v>=SCHEMA), ex=legacy?local:rm;
+      // adopt the cloud copy wholesale — this is what lets edits & deletes from the other phone land here
+      const adopted=normalize({
+        starts: Array.isArray(rm.starts)?rm.starts:(rm.start?[rm.start]:[]),
+        entries: Array.isArray(rm.entries)?rm.entries:(Array.isArray(rm.log)?rm.log:[]),
+        periodLen: rm.periodLen, cycleSeed: rm.cycleSeed, wedding: rm.wedding,
+        preg: ex.preg||null, post: ex.post||null, pregHistory: ex.pregHistory||[], snoozeUntil: ex.snoozeUntil||null,
+        names: Array.isArray(rm.names)?rm.names:(local.names||[]),   // a copy without the list never wipes ours
+        updatedAt: rm.updatedAt
+      });
+      saveLocal(adopted); render(true);
+      const u=rm.updatedAt?new Date(rm.updatedAt):null;
+      setSync('ok',u?`Synced · ${fmt(u)}`:'Synced');
+      if((legacy && (adopted.preg||adopted.post||adopted.pregHistory.length)) || (!Array.isArray(rm.names) && adopted.names.length)) syncPush(adopted);
+    } else {
+      // local is newer (or cloud empty): keep local, and push it up so the cloud catches up
+      render(true);
+      setSync('ok','Synced');
+      if((local.starts&&local.starts.length)||(local.entries&&local.entries.length)) syncPush(local,true);
+    }
+  }catch(e){
+    setSync('err','Offline — showing last saved');
+    // never get stuck: if there is local data, show it; otherwise drop to setup
+    if(loadLocal()) render(true);
+    else if(document.getElementById('app')) document.getElementById('app').innerHTML=welcome();
+  }
+}
+async function syncPush(d,keepStamp){
+  if((!d.starts||!d.starts.length) && (!d.entries||!d.entries.length)){ return; } // never overwrite cloud with a blank set
+  if(API_BASE.indexOf('__WORKER_URL__')!==-1){ setSync('err','Saved on phone — backend not set'); return; }
+  setSync('load','Saving…');
+  try{
+    const st=stats(d);
+    const lastStart=st.dates.length?isoLocal(st.dates[st.dates.length-1]):null;
+    const chicDates=[...new Set(d.entries.map(e=>e.date))].sort();
+    // reuse existing timestamp on catch-up pushes; otherwise mint a fresh one for this edit
+    const stamp = (keepStamp && d.updatedAt) ? d.updatedAt : new Date().toISOString();
+    const body={starts:d.starts, entries:d.entries, chicDates, log:chicDates, periodLen:d.periodLen, cycleSeed:d.cycleSeed, wedding:d.wedding, start:lastStart, cycleLen:st.predicted, updatedAt:stamp,
+      v:SCHEMA, mode:modeOf(d), preg:d.preg||null, post:d.post||null, pregHistory:d.pregHistory||[], snoozeUntil:d.snoozeUntil||null, pauses:pauses(d), names:d.names||[]};
+    // keep local stamped identically so newest-wins comparisons are accurate
+    saveLocal({...d, updatedAt:stamp});
+    const r=await timedFetch(basketURL(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok) throw 0;
+    setSync('ok','Saved & synced');
+  }catch(e){ setSync('err','Saved on phone — sync failed'); }
+}
+
+/* ---------- render ---------- */
+function render(keepSync){
+  const d=loadLocal();
+  if(!d || (d.starts.length===0 && !d.preg && !d.post)){ document.getElementById('app').innerHTML=welcome(); return; }
+  const mode=modeOf(d);
+  if(mode==='preg'){ renderPreg(d,keepSync); return; }
+  if(mode==='post'){ renderPost(d,keepSync); return; }
+  const st=stats(d);
+  const pred=prediction(d,st);
+  const conf=confidence(st);
+  const p=PHASES[pred.pIdx];
+  const cd=chicInfo(d,pred.lastStart);
+  const vb=vibe(cd,pred);
+  const congrats=isCongrats(pred,cd);
+  const snoozed=!!(d.snoozeUntil && todayStr()<d.snoozeUntil);
+  const ask=(forceAsk || ((congrats || pred.daysLate>=7) && !snoozed)) ? askHTML(pred,congrats) : '';
+
+  const R=100, CIRC=2*Math.PI*R, frac=Math.min(1,pred.dayInCycle/pred.L), off=CIRC*(1-frac);
+  const ov=pred.L-14;
+  const segs=[{w:pred.P,c:PCOL[0]},{w:(ov-pred.P-3),c:PCOL[1]},{w:4,c:PCOL[2]},{w:pred.L-(ov+1),c:PCOL[3]}];
+  const tot=segs.reduce((a,s)=>a+Math.max(0,s.w),0);
+  const barHTML=segs.map(s=>`<div class="seg" style="width:${Math.max(0,s.w)/tot*100}%;background:${s.c}"></div>`).join('');
+  const markPos=Math.min(99,frac*100);
+
+  let banner='';
+  if(pred.isLate) banner=`<div class="banner late">⏰ Period is ${pred.daysLate} day${pred.daysLate===1?'':'s'} late${pred.daysLate>=7?' — might be worth a check':''}</div>`;
+  else if(pred.daysToNext<=2) banner=`<div class="banner warn">⛈️ Code Red likely ${pred.daysToNext===0?'today':pred.daysToNext===1?'tomorrow':'in 2 days'} — stock up</div>`;
+  else if(pred.inFertile||pred.daysToOv===0) banner=`<div class="banner love">💘 Date Night window is open</div>`;
+
+  const rangeTxt = st.n ? `${fmt(pred.lo)} – ${fmt(pred.hi)} window` : 'rough window, log more to refine';
+  const nextBig = pred.isLate ? `${pred.daysLate}d late` : (pred.daysToNext===0?'Today':pred.daysToNext===1?'Tomorrow':`in ${pred.daysToNext} days`);
+
+  const ann=annInfo(d);
+  let annTop='', annBanner='', annFoot='';
+  if(ann){
+    if(ann.beforeWedding){
+      annFoot=`💍 ${ann.daysToWedding} day${ann.daysToWedding===1?'':'s'} until the big day`;
+    } else {
+      annFoot=`💍 Married ${ann.wedding.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} · ${ann.months} month${ann.months===1?'':'s'} together · next monthly ${fmt(ann.nextMonthly)}`;
+      if(ann.yearlyToday){
+        annTop=`<div class="ann-fest"><div class="af-e">💍🎉</div><div><div class="af-h">Happy Anniversary!</div><div class="af-s">${ann.years} year${ann.years===1?'':'s'} together today — here's to many more 🥂</div></div></div>`;
+      } else if(ann.daysToYearly<=3){
+        annBanner+=`<div class="banner love">💍 ${ann.nextYears}-year anniversary in ${ann.daysToYearly} day${ann.daysToYearly===1?'':'s'} 🎉</div>`;
+      }
+      if(ann.monthlyToday && !ann.yearlyToday){
+        annBanner=`<div class="banner love">💕 ${ann.months} month${ann.months===1?'':'s'} together today</div>`+annBanner;
+      }
+    }
+  }
+
+  if(d.post && isDate(d.post.babyDob)){ const a=babyAge(d.post.babyDob); if(a) annFoot=`👶 ${esc(d.post.babyName||'Baby')} · ${a} old`+(annFoot?'<br>'+annFoot:''); }
+
+  document.getElementById('app').innerHTML=`
+    <div class="top">
+      <div class="brand"><span class="moon"></span> Chic Chic</div>
+      <div class="gear" onclick="openSheet()">⚙</div>
+    </div>
+    <div class="sync" id="syncLine"><span class="sdot"></span>Syncing…</div>
+
+    ${annTop}
+    <div class="status" style="background:${vb.grad};color:${vb.color}">
+      <div class="se">${vb.emoji}</div>
+      <div><div class="sh">${vb.head}</div><div class="ss">${vb.sub}</div></div>
+    </div>
+
+    ${ask}${annBanner}${banner}
+
+    <div class="hero"><div class="ring">
+      <svg width="230" height="230" viewBox="0 0 230 230">
+        <circle cx="115" cy="115" r="${R}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="15"/>
+        <circle cx="115" cy="115" r="${R}" fill="none" stroke="${p.color}" stroke-width="15" stroke-linecap="round" stroke-dasharray="${CIRC}" stroke-dashoffset="${off}"/>
+      </svg>
+      <div class="center">
+        <div class="emoji">${p.emoji}</div>
+        <div class="phase">${p.label}</div>
+        <div class="dayline">Day ${pred.dayInCycle}${pred.isLate?'':' of ~'+pred.L}</div>
+      </div>
+    </div></div>
+
+    <div class="quip">${p.quip}</div>
+
+    <div class="chic">
+      <div><div class="chic-k">✨ Chic Chic</div>
+      <div class="chic-v">${cd.loggedToday?'Today 🎉':(cd.daysAgo!=null?cd.daysAgo+' day'+(cd.daysAgo===1?'':'s')+' ago':'None logged yet')}</div>
+      <div class="chic-sub">${cd.last?'Last on '+fmt(cd.last)+' · '+cd.thisCycleEntries+' this cycle':'Add one in settings ⚙'}</div></div>
+      <button class="chic-btn" onclick="openSheet()">＋ Log</button>
+    </div>
+    ${(()=>{const n=chicNudge(cd);return n?`<div class="banner ${n.cls}">${n.t}</div>`:'';})()}
+    ${cd.total>=2?`<div class="ccstats">
+      <div class="ccs"><div class="ccs-v">${cd.currentGap}d</div><div class="ccs-k">Current gap</div></div>
+      <div class="ccs"><div class="ccs-v" style="color:${cd.beatingRecord?'var(--amber)':'var(--txt)'}">${Math.max(cd.recordGap,cd.beatingRecord?cd.currentGap:0)}d</div><div class="ccs-k">Longest ever</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.avgGap!=null?cd.avgGap+'d':'—'}</div><div class="ccs-k">Avg gap</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.thisMonth}</div><div class="ccs-k">This month</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.bestMonth}</div><div class="ccs-k">Best month</div></div>
+      <div class="ccs"><div class="ccs-v">${cd.total}</div><div class="ccs-k">All time</div></div>
+    </div>${cd.recordStart?`<div class="ccnote">Longest dry spell: ${cd.recordGap} days (${fmt(cd.recordStart)} → ${fmt(cd.recordEnd)})${cd.bestMonthKey?' · best month '+monthName(cd.bestMonthKey):''}</div>`:''}`:''}
+
+    <div class="grid2">
+      <div class="stat"><div class="k">💘 Date Night</div>
+        <div class="v">${pred.daysToOv===0?'Today':'in '+pred.daysToOv+'d'}</div>
+        <div class="sub">${fmt(pred.ovDate)} · predicted</div></div>
+      <div class="stat"><div class="k">↩ Last period</div>
+        <div class="v">${fmt(pred.lastStart)}</div>
+        <div class="sub">${pred.daysSince} days ago</div></div>
+    </div>
+
+    <div class="section-t">This cycle at a glance</div>
+    <div class="timeline">
+      <div class="marker"><div class="dot" style="left:${markPos}%"></div></div>
+      <div class="bar">${barHTML}</div>
+      <div class="legend">${PHASES.map(x=>`<div class="lg"><span class="sw" style="background:${x.color}"></span>${x.label}</div>`).join('')}</div>
+    </div>
+
+    <div class="section-t">The four moods</div>
+    <div class="phaselist">
+      ${PHASES.map((x,i)=>{const o=pred.L-14;const r=i===0?`1–${pred.P}`:i===1?`${pred.P+1}–${o-3}`:i===2?`${o-2}–${o+1}`:`${o+2}–${pred.L}`;
+        return `<div class="pcard ${i===pred.pIdx?'active':''}"><div class="pemoji">${x.emoji}</div>
+        <div class="pmeta"><div class="pname" style="color:${i===pred.pIdx?x.color:'var(--txt)'}">${x.label}</div><div class="pdesc">${x.short}</div></div>
+        <div class="prange">Days ${r}</div></div>`;}).join('')}
+    </div>
+
+    <div class="section-t">Her patterns</div>
+    ${insightsHTML(d,st)}
+
+    <div class="section-t">Cycle calendar</div>
+    <div id="cal"></div>
+
+    <div class="section-t">Chic Chic calendar ✨</div>
+    <div id="chiccal"></div>
+
+    <div class="foot">${annFoot?annFoot+'<br><br>':''}Predictions learn from logged dates and are estimates — real cycles vary, and big swings have many normal causes. Not medical advice or birth control.<br><br>Made with 🤍 for the two of you.</div>
+  `;
+  renderCalendar(d,st,pred);
+  renderChicCalendar(d);
+  if(!keepSync) syncPull(true);
+}
+
+function insightsHTML(d,st){
+  if(st.n===0) return `<div class="empty">Log a second period start and her real averages, regularity, and cycle history will appear here.</div>`;
+  const reg = st.spread<=2?'Very regular':st.spread<=4?'Fairly regular':st.spread<=7?'Somewhat variable':'Irregular';
+  const avgGrid=`<div class="avg-grid">
+    <div class="stat"><div class="k">Avg cycle</div><div class="v">${st.avg} <small>days</small></div><div class="sub">last ${st.n} cycle${st.n===1?'':'s'}</div></div>
+    <div class="stat"><div class="k">Period length</div><div class="v">${d.periodLen} <small>days</small></div><div class="sub">set manually</div></div>
+    <div class="stat"><div class="k">Regularity</div><div class="v" style="font-size:15px">${reg}</div><div class="sub">${st.n>=1?'varies '+st.min+'–'+st.max+'d':''}</div></div>
+    <div class="stat"><div class="k">Cycles logged</div><div class="v">${st.n}</div><div class="sub">${st.dates.length} start dates</div></div>
+  </div>`;
+  const maxL=Math.max(...st.lengths,1); let rows='';
+  for(let i=st.lengths.length-1;i>=0;i--){ const a=st.cycles[i].a,b=st.cycles[i].b,len=st.lengths[i];
+    rows+=`<div class="hrow"><div class="hd">${fmt(a)} → ${fmt(b)}</div><div class="htrack"><div class="hfill" style="width:${Math.round(len/maxL*100)}%"></div></div><div class="hlen">${len}d</div></div>`; }
+  return avgGrid + `<div class="hist">${rows}</div>`;
+}
+
+function renderCalendar(d,st,pred){
+  const box=document.getElementById('cal'); if(!box) return;
+  if(!calMonth) calMonth=new Date(midnight(new Date()).getFullYear(),midnight(new Date()).getMonth(),1);
+  const y=calMonth.getFullYear(), m=calMonth.getMonth();
+  const startDow=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  const today=midnight(new Date());
+  const startSet=new Set(d.starts);
+  const dows=['S','M','T','W','T','F','S'];
+  let cells=dows.map(x=>`<div class="cal-dow">${x}</div>`).join('');
+  for(let i=0;i<startDow;i++) cells+=`<div></div>`;
+  for(let day=1;day<=days;day++){
+    const date=midnight(new Date(y,m,day));
+    const ph=phaseForDate(date,d,st);
+    let alpha = ph?(ph.predicted?'2e':'55'):null;
+    if(ph && ph.idx===2){ const o=ph.len-14, pos=ph.dayInCycle-o; alpha=(pos===-1||pos===0)?'cc':(pos===-2)?'55':'33'; }
+    const bg = ph?PCOL[ph.idx]+alpha:'transparent';
+    const isToday=date.getTime()===today.getTime();
+    const isStart=startSet.has(isoLocal(date));
+    cells+=`<div class="cal-cell${isToday?' today':''}${isStart?' start':''}" style="background:${bg}">${day}</div>`;
+  }
+  box.innerHTML=`<div class="cal">
+    <div class="cal-nav"><button onclick="calStep(-1)">‹</button><div class="cal-title">${MONTHS[m]} ${y}</div><button onclick="calStep(1)">›</button></div>
+    <div class="cal-grid">${cells}</div>
+    <div class="legend" style="margin-top:12px">${PHASES.map(x=>`<div class="lg"><span class="sw" style="background:${x.color}"></span>${x.label}</div>`).join('')}</div>
+    <div class="cal-pred-note">Bright = logged · faded = predicted · ⬜ring = period start · Date Night brightest at peak</div>
+  </div>`;
+}
+function calStep(n){ if(!calMonth) calMonth=new Date(); calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+n,1); const d=loadLocal(); const st=stats(d); renderCalendar(d,st,prediction(d,st)); }
+
+function phaseForDate(date,d,st){
+  if(st.dates.length===0) return null;
+  const P=d.periodLen, L=st.predicted, dates=st.dates;
+  let cs,len,predicted=false;
+  if(date<dates[0]){ let s=dates[0]; while(date<s){ s=addDays(s,-L); } cs=s; len=L; predicted=true; }
+  else { let idx=0; for(let i=0;i<dates.length;i++){ if(dates[i]<=date) idx=i; }
+    if(idx<dates.length-1){ cs=dates[idx]; len=Math.round((dates[idx+1]-dates[idx])/DAY); if(len>LONG_GAP){ if(date>=addDays(cs,L)) return null; len=L; } }
+    else { let s=dates[idx]; while(date>=addDays(s,L)){ s=addDays(s,L); predicted=true; } cs=s; len=L; } }
+  const dayInCycle=Math.floor((date-cs)/DAY)+1;
+  let idx=phaseIdx(dayInCycle,len,P); if(dayInCycle>len) idx=3;
+  const isStart=dates.some(dd=>dd.getTime()===date.getTime());
+  return {idx,isStart,predicted,dayInCycle,len};
+}
+
+function renderChicCalendar(d){
+  const box=document.getElementById('chiccal'); if(!box) return;
+  if(!chicCalMonth) chicCalMonth=new Date(midnight(new Date()).getFullYear(),midnight(new Date()).getMonth(),1);
+  const y=chicCalMonth.getFullYear(), m=chicCalMonth.getMonth();
+  const startDow=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  const today=midnight(new Date());
+  const counts={}; d.entries.forEach(e=>{ counts[e.date]=(counts[e.date]||0)+1; });
+  const dows=['S','M','T','W','T','F','S'];
+  let cells=dows.map(x=>`<div class="cal-dow">${x}</div>`).join('');
+  for(let i=0;i<startDow;i++) cells+=`<div></div>`;
+  let monthTotal=0;
+  for(let day=1;day<=days;day++){
+    const ds=isoLocal(midnight(new Date(y,m,day)));
+    const c=counts[ds]||0; monthTotal+=c;
+    const isToday=midnight(new Date(y,m,day)).getTime()===today.getTime();
+    const bg = c>0 ? `rgba(232,96,122,${Math.min(.25+c*0.18,.85)})` : 'transparent';
+    cells+=`<div class="ccell${isToday?' today':''}" style="background:${bg}" onclick="logOn('${ds}')">${day}${c>0?`<span class="badge">${c}×</span>`:''}</div>`;
+  }
+  box.innerHTML=`<div class="cal">
+    <div class="cal-nav"><button onclick="chicCalStep(-1)">‹</button><div class="cal-title">${MONTHS[m]} ${y} · ${monthTotal}×</div><button onclick="chicCalStep(1)">›</button></div>
+    <div class="cal-grid">${cells}</div>
+    <div class="cal-pred-note">Tap a day to log Chic Chic for it · number = times that day</div>
+  </div>`;
+}
+function chicCalStep(n){ if(!chicCalMonth) chicCalMonth=new Date(); chicCalMonth=new Date(chicCalMonth.getFullYear(),chicCalMonth.getMonth()+n,1); renderChicCalendar(loadLocal()); }
+function logOn(ds){ openSheet(); document.getElementById('chicInput').value=ds; }
+
+function welcome(){
+  return `<div class="top"><div class="brand"><span class="moon"></span> Chic Chic</div></div>
+  <div style="text-align:center;padding:64px 12px"><div style="font-size:56px;margin-bottom:14px">🌙</div>
+  <div style="font-size:20px;font-weight:700;margin-bottom:8px">Let's get set up</div>
+  <div style="font-size:14px;color:var(--mut);line-height:1.6;margin-bottom:26px">Add the first day of her last period. Add a few past ones too if you remember — that's what makes predictions accurate.</div>
+  <button class="btn" style="max-width:260px;margin:0 auto" onclick="openSheet()">Get started</button></div>`;
+}
+
+/* ---------- settings ---------- */
+function renderStars(who){
+  const v = who==='Aj'?editAj:editNi;
+  const box=document.getElementById(who==='Aj'?'starsAj':'starsNi'); if(!box) return;
+  box.innerHTML=[1,2,3,4,5].map(n=>`<span class="star ${n<=v?'on':''}" onclick="setStar('${who}',${n})">⭐</span>`).join('');
+}
+function setStar(who,n){ if(who==='Aj') editAj=(editAj===n?0:n); else editNi=(editNi===n?0:n); renderStars(who); }
+
+function openSheet(){
+  const d=loadLocal();
+  editStarts = d?d.starts.slice():[];
+  editEntries = d?d.entries.map(e=>({...e})):[];
+  editAj=0; editNi=0;
+  document.getElementById('periodLen').value = d?d.periodLen:5;
+  document.getElementById('cycleSeed').value = d?d.cycleSeed:28;
+  document.getElementById('weddingInput').value = (d&&d.wedding)?d.wedding:DEFAULT_WEDDING;
+  document.getElementById('codeField').value = syncCode();
+  document.getElementById('startInput').value = isoLocal(new Date());
+  document.getElementById('chicInput').value = isoLocal(new Date());
+  renderStartChips(); renderChicChips(); renderStars('Aj'); renderStars('Ni');
+  document.getElementById('modeRow').innerHTML=modeRowHTML(d);
+  document.getElementById('sheet').classList.add('show');
+}
+function closeSheet(){ document.getElementById('sheet').classList.remove('show'); render(); }
+
+function renderStartChips(){
+  const box=document.getElementById('startChips'); if(!box) return;
+  const s=editStarts.slice().sort().reverse();
+  box.innerHTML = s.length ? s.map(x=>`<span class="chip-x">${fmt(parseD(x))} '${x.slice(2,4)}<button type="button" onclick="removeStart('${x}')">×</button></span>`).join('') : `<span style="font-size:12px;color:var(--faint)">No dates yet</span>`;
+}
+function addStart(){ const v=document.getElementById('startInput').value; if(v&&!editStarts.includes(v)) editStarts.push(v); renderStartChips(); }
+function removeStart(s){ editStarts=editStarts.filter(x=>x!==s); renderStartChips(); }
+
+function starStr(n){ return n>0 ? '★'.repeat(n) : '–'; }
+function renderChicChips(){
+  const box=document.getElementById('chicChips'); if(!box) return;
+  const s=editEntries.slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
+  box.innerHTML = s.length ? s.map(e=>`<span class="chip-x">${fmt(parseD(e.date))} · Aj ${starStr(e.aj)} Ni ${starStr(e.ni)}<button type="button" onclick="removeChic('${e.id}')">×</button></span>`).join('') : `<span style="font-size:12px;color:var(--faint)">No entries yet</span>`;
+}
+function addChic(){
+  const v=document.getElementById('chicInput').value; if(!v) return;
+  editEntries.push({id:uid(v), date:v, aj:editAj, ni:editNi});
+  editAj=0; editNi=0; renderStars('Aj'); renderStars('Ni'); renderChicChips();
+}
+function removeChic(id){ editEntries=editEntries.filter(e=>e.id!==id); renderChicChips(); }
+
+async function save(){
+  if(editStarts.length===0){ alert('Add at least one period start date 🙂'); return; }
+  const periodLen=Math.max(2,Math.min(10,parseInt(document.getElementById('periodLen').value)||5));
+  const cycleSeed=Math.max(20,Math.min(45,parseInt(document.getElementById('cycleSeed').value)||28));
+  const wedding=(document.getElementById('weddingInput').value||DEFAULT_WEDDING);
+  const newCode=(document.getElementById('codeField').value||'').trim();
+  const codeChanged = newCode && newCode!==syncCode();
+  if(newCode) setCode(newCode);
+  const d=normalize({...(loadLocal()||{}), starts:editStarts, entries:editEntries, periodLen, cycleSeed, wedding});  // keep mode keys
+  saveLocal(d);
+  document.getElementById('sheet').classList.remove('show');
+  calMonth=null; chicCalMonth=null; render(true);
+  if(codeChanged){ await syncPull(false); }   // pull from the newly entered code first
+  await syncPush(d);
+}
+
+/* ---------- export / import ---------- */
+function dl(blob,name){ const u=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),1500); }
+function exportJSON(){ const d=loadLocal()||{}; dl(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}), `chic-chic-backup-${isoLocal(new Date())}.json`); }
+function exportCSV(){
+  const d=loadLocal()||{entries:[]}; const rows=[['date','aj_stars','ni_stars']];
+  (d.entries||[]).forEach(e=>rows.push([e.date,e.aj,e.ni]));
+  dl(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}), `chic-chic-${isoLocal(new Date())}.csv`);
+}
+function importJSON(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const d=normalize(JSON.parse(r.result)); if(!d){alert('Invalid file');return;} saveLocal(d); calMonth=null;chicCalMonth=null; render(true); syncPush(d); alert('Backup restored ✓'); }catch(e){ alert('Could not read that file'); } };
+  r.readAsText(f); ev.target.value='';
+}
+
+document.getElementById('sheet').addEventListener('click',e=>{ if(e.target.id==='sheet') closeSheet(); });
+document.getElementById('msheet').addEventListener('click',e=>{ if(e.target.id==='msheet') closeM(); });
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden && getCode()) syncPull(false); });
+function startPoll(){ if(pollTimer)clearInterval(pollTimer); pollTimer=setInterval(()=>{ if(!document.hidden && getCode()) syncPull(true); },60000); }
+
+function connectScreen(){
+  document.getElementById('app').innerHTML=`
+    <div class="top"><div class="brand"><span class="moon"></span> Chic Chic</div></div>
+    <div class="connect">
+      <div class="ce">🔗</div>
+      <h2>Connect your Chic Chic</h2>
+      <p>Enter your shared code to load your saved history on this device. Use the same code on both phones and they'll stay in sync.</p>
+      <input id="codeInput" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="shared code">
+      <button class="btn" style="max-width:300px" onclick="codeContinue()">Continue</button>
+      <div class="cnote">This code is the key to your data — anyone with it can see your entries, so keep it private. It's pre‑filled for you; just tap Continue.</div>
+    </div>`;
+  const i=document.getElementById('codeInput'); if(i) i.value=DEFAULT_ID;
+}
+async function codeContinue(){
+  const v=(document.getElementById('codeInput').value||'').trim();
+  if(!v){ alert('Enter your shared code 🙂'); return; }
+  setCode(v);
+  document.getElementById('app').innerHTML=`<div class="connect"><div class="ce">⏳</div><h2>Loading your data…</h2></div>`;
+  await syncPull(false);   // pull cloud FIRST, then show history
+  startPoll();
+}
+
+function boot(){
+  if(!getCode()){ connectScreen(); return; }           // first run on this device → ask for code
+  if(loadLocal()) render(); else document.getElementById('app').innerHTML=`<div class="connect"><div class="ce">⏳</div><h2>Loading your data…</h2></div>`;
+  syncPull(false);                                      // always pull-merge cloud on load
+  startPoll();
+}
+boot();
+</script>
+</body>
+</html>
